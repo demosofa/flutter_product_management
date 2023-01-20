@@ -1,23 +1,26 @@
 import 'package:product_manager/utils/class_util.dart';
 
 class Product implements ClassUtil {
-  String? customerName;
+  String? name;
   String? phone;
   String? address;
-  String? favGas;
-  String? gift;
+  int? cost;
+  int? price;
+  int? init;
+  int? sold;
+
   Product();
-  Product.full(this.customerName, this.phone, this.address, this.favGas);
-  Product.withGift(
-      this.customerName, this.phone, this.address, this.favGas, this.gift);
+  Product.full(this.name, this.phone, this.address, this.cost, this.price,
+      this.init, this.sold);
+
   @override
   Map<String, Object?> toMap() {
     return {
-      "customeName": customerName,
+      "name": name,
       "phone": phone,
       "address": address,
-      "favGas": favGas,
-      "gift": gift
+      "init": init,
+      "sold": sold
     };
   }
 }

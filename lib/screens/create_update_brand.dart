@@ -5,24 +5,24 @@ import 'package:product_manager/helpers/sqlite_helper.dart';
 
 import '../models/product.dart';
 
-class CreateUpdate extends StatefulWidget {
+class CreateUpdateBrand extends StatefulWidget {
   final String? id;
-  const CreateUpdate({super.key, this.id});
+  const CreateUpdateBrand({super.key, this.id});
 
   @override
-  State<CreateUpdate> createState() => _CreateUpdateState();
+  State<CreateUpdateBrand> createState() => _CreateUpdateBrandState();
 }
 
-class _CreateUpdateState extends State<CreateUpdate> {
+class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
   final _formKey = GlobalKey<FormState>();
   final product = Product();
-  String title = "Create";
+  String title = "Tạo Thương Hiệu";
 
   @override
   void initState() {
     if (widget.id != null) {
       setState(() {
-        title = "Update";
+        title = "Cập nhật Thương Hiệu";
       });
     }
     super.initState();
@@ -58,18 +58,18 @@ class _CreateUpdateState extends State<CreateUpdate> {
             child: Column(
               children: <Widget>[
                 TextFormField(
-                  initialValue: product.customerName,
+                  initialValue: product.name,
                   onSaved: (value) {
-                    product.customerName = value;
+                    product.name = value;
                   },
                   validator: (value) {
                     if (value?.isNotEmpty == true) return null;
-                    return "Please fill name";
+                    return "Xin hãy điền tên thương hiệu";
                   },
                   keyboardType: TextInputType.name,
                   inputFormatters: [LengthLimitingTextInputFormatter(25)],
                   decoration: const InputDecoration(
-                      hintText: "Tên khách hàng",
+                      hintText: "Tên thương hiệu",
                       prefixIcon: Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Icon(Icons.person),
@@ -83,12 +83,12 @@ class _CreateUpdateState extends State<CreateUpdate> {
                   },
                   validator: (value) {
                     if (value?.isNotEmpty == true) return null;
-                    return "Please fill address";
+                    return "Xin hãy điền địa chỉ nhập hàng";
                   },
                   keyboardType: TextInputType.streetAddress,
                   inputFormatters: [LengthLimitingTextInputFormatter(100)],
                   decoration: const InputDecoration(
-                      hintText: "Địa chỉ nhà",
+                      hintText: "Địa chỉ nhập hàng",
                       prefixIcon: Padding(
                         padding: EdgeInsets.symmetric(vertical: 10),
                         child: Icon(Icons.streetview),
@@ -102,7 +102,7 @@ class _CreateUpdateState extends State<CreateUpdate> {
                   },
                   validator: (value) {
                     if (value?.isNotEmpty == true) return null;
-                    return "Please fill phone number";
+                    return "Xin hãy điền điện thoại liên hệ nhập hàng";
                   },
                   keyboardType: TextInputType.phone,
                   inputFormatters: [

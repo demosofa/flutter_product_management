@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
-import 'package:product_manager/screens/create_update.dart';
+import 'package:product_manager/screens/create_update_brand.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
     }
     if (pathElements[1] == 'product') {
       return MaterialPageRoute<bool>(
-          builder: (context) => const CreateUpdate());
+          builder: (context) => const CreateUpdateBrand());
     }
     return null;
   }
@@ -56,31 +58,45 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Map<String, Object?>>? lstGas;
-  @override
-  Future<void> initState() async {
+  Future<List<String>> fetchProduct() async {
+    List<Map<String, Object?>> lstGas = [];
     final db = await SQLiteHelper.open();
-    await db!.transaction((txn) async {
-      lstGas = await txn.query("Gas");
-    });
-    super.initState();
+    if (db != null) {
+      await db.transaction((txn) async {
+        lstGas = await txn.query("Product");
+      });
+    }
+    return lstGas.map((e) => json.encode(e)).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
+    // This method is rerun every time setState is called
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Column(children: <Widget>[Card()]),
+      body: FutureBuilder(
+        future: fetchProduct(),
+        builder: (context, snapshot) {
+          if (snapshot.data == null) {
+            return const Text('Loading');
+          } else {
+            return ListView(children: <Widget>[
+              for (var i = 0; i < snapshot.data!.length; i++)
+                Card(
+                  child: Text(snapshot.data![i]),
+                )
+            ]);
+          }
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const CreateUpdate()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const CreateUpdateBrand()));
         },
         tooltip: 'Add',
         child: const Icon(Icons.add),

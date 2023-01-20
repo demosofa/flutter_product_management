@@ -257,7 +257,8 @@ Also edit `Navigator.push<type>[…].then((type value) {})` adding future type.
 
 </details>
 
-<details><summary>Sidebar</summary>
+<details>
+<summary>Sidebar</summary>
 
 ### Add left drawer
 
