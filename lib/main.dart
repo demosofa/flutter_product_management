@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/screens/create_update_brand.dart';
 
 void main() {
@@ -60,12 +59,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   Future<List<String>> fetchProduct() async {
     List<Map<String, Object?>> lstGas = [];
-    final db = await SQLiteHelper.open();
-    if (db != null) {
-      await db.transaction((txn) async {
-        lstGas = await txn.query("Product");
-      });
-    }
+    // final db = await SQLiteHelper.open();
+    // if (db != null) {
+    //   await db.transaction((txn) async {
+    //     lstGas = await txn.query("Product");
+    //   });
+    // }
+    // await SQLiteHelper.delete();
     return lstGas.map((e) => json.encode(e)).toList();
   }
 
