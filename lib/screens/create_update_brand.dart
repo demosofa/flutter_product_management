@@ -125,6 +125,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                     onSaved: (newValue) {
                       brand.note = newValue;
                     },
+                    maxLines: null,
                     keyboardType: TextInputType.multiline,
                     inputFormatters: [LengthLimitingTextInputFormatter(200)],
                     decoration: const InputDecoration(
