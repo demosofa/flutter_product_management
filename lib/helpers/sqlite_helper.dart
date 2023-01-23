@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -26,9 +24,9 @@ class SQLiteHelper {
           await db.execute(tableProduct);
         },
       );
-      final check = await _db!.rawQuery(
-          "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
-      log('check if table exists $check');
+      // final check = await _db!.rawQuery(
+      //     "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
+      // log('check if table exists $check');
     }
     return _db;
   }

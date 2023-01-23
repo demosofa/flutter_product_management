@@ -1,7 +1,8 @@
-import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
+import 'package:product_manager/models/brand.dart';
 import 'package:product_manager/screens/create_update_brand.dart';
 
 void main() {
@@ -13,13 +14,24 @@ class MyApp extends StatelessWidget {
 
   Route<dynamic>? generateRoute(RouteSettings settings) {
     final List<String> pathElements = settings.name!.split("/");
+    inspect(pathElements);
 
     if (pathElements[0] != "") {
       return null;
     }
-    if (pathElements[1] == 'product') {
-      return MaterialPageRoute<bool>(
-          builder: (context) => const CreateUpdateBrand());
+    if (pathElements[1] == 'create_update_brand') {
+      return PageRouteBuilder(
+        pageBuilder: ((context, animation, secondaryAnimation) {
+          return CreateUpdateBrand(
+            data: Brand().fromMap(settings.arguments as Map<String, dynamic>),
+          );
+        }),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
     }
     return null;
   }
@@ -58,17 +70,18 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<List<String>> fetchProduct() async {
-    List<Map<String, Object?>> lstGas = [];
+  Future<List<Map<String, Object?>>> fetchProduct() async {
+    List<Map<String, Object?>> lstBrand = [];
     final db = await SQLiteHelper.open();
     if (db != null && db.isOpen == true) {
       await db.transaction((txn) async {
-        lstGas = await txn.query("Product");
+        lstBrand = await txn.query("Brand");
       });
     }
     // log('get db path: ${db!.path}');
     // await SQLiteHelper.delete();
-    return lstGas.map((e) => json.encode(e)).toList();
+    // inspect(lstBrand);
+    return lstBrand;
   }
 
   @override
@@ -88,8 +101,29 @@ class _MyHomePageState extends State<MyHomePage> {
           } else {
             return ListView(children: <Widget>[
               for (var i = 0; i < snapshot.data!.length; i++)
-                Card(
-                  child: Text(snapshot.data![i]),
+                GestureDetector(
+                  child: Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Column(children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(snapshot.data![i]["name"].toString()),
+                            Text(snapshot.data![i]["phone"].toString())
+                          ],
+                        )
+                      ]),
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushNamed("/create_update_brand",
+                            arguments: snapshot.data![i])
+                        .then((value) => setState(
+                              () {},
+                            ));
+                  },
                 )
             ]);
           }
