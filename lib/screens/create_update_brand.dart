@@ -44,9 +44,13 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
             context: context,
             builder: ((context) {
               return Dialog(
+                  child: SizedBox(
+                width: 200,
+                height: 150,
                 child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Flex(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       direction: Axis.vertical,
                       children: <Widget>[
                         const Text("Thành công thêm Thương hiệu mới"),
@@ -62,7 +66,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                         )
                       ],
                     )),
-              );
+              ));
             }));
       } else {
         await db!.transaction((txn) async {

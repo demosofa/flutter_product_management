@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/brand.dart';
+import 'package:product_manager/models/product.dart';
 import 'package:product_manager/screens/create_update_brand.dart';
+import 'package:product_manager/screens/create_update_product.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,22 +18,29 @@ class MyApp extends StatelessWidget {
     final List<String> pathElements = settings.name!.split("/");
     inspect(pathElements);
 
-    if (pathElements[0] != "") {
-      return null;
-    }
-    if (pathElements[1] == 'create_update_brand') {
-      return PageRouteBuilder(
-        pageBuilder: ((context, animation, secondaryAnimation) {
-          return CreateUpdateBrand(
-            data: Brand().fromMap(settings.arguments as Map<String, dynamic>),
+    if (pathElements[0] != "") return null;
+
+    switch (pathElements[1]) {
+      case 'create_update_brand':
+        return PageRouteBuilder(
+          pageBuilder: ((context, animation, secondaryAnimation) {
+            return CreateUpdateBrand(
+              data: Brand().fromMap(settings.arguments as Map<String, dynamic>),
+            );
+          }),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+              FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        );
+      case 'create_update_product':
+        return MaterialPageRoute(builder: ((context) {
+          return CreateUpdateProduct(
+            data: Product().fromMap(settings.arguments as Map<String, dynamic>),
           );
-        }),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-            FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
-      );
+        }));
+      default:
     }
     return null;
   }
@@ -56,21 +65,40 @@ class MyApp extends StatelessWidget {
             TargetPlatform.android: ZoomPageTransitionsBuilder()
           })),
       onGenerateRoute: generateRoute,
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
+  MyHomePage({super.key, this.title});
+  final String? title;
+  final List<NavigationDestination> routes = [
+    const NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
+    const NavigationDestination(icon: Icon(Icons.history), label: 'History')
+  ];
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Future<List<Map<String, Object?>>> fetchProduct() async {
+  int currentPageIdx = 0;
+  String title = "Demo";
+
+  @override
+  void initState() {
+    setState(() {
+      if (widget.title != null) {
+        title = widget.title!;
+      } else {
+        title = widget.routes[currentPageIdx].label;
+      }
+    });
+    super.initState();
+  }
+
+  Future<List<Map<String, Object?>>> fetchBrand() async {
     List<Map<String, Object?>> lstBrand = [];
     final db = await SQLiteHelper.open();
     if (db != null && db.isOpen == true) {
@@ -91,48 +119,68 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text(title),
       ),
-      body: FutureBuilder(
-        future: fetchProduct(),
-        builder: (context, snapshot) {
-          if (snapshot.data == null) {
-            return const Text('Loading');
-          } else {
-            return ListView(children: <Widget>[
-              for (var i = 0; i < snapshot.data!.length; i++)
-                GestureDetector(
-                  child: Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(snapshot.data![i]["name"].toString()),
-                            Text(snapshot.data![i]["phone"].toString())
-                          ],
-                        )
-                      ]),
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context)
-                        .pushNamed("/create_update_brand",
-                            arguments: snapshot.data![i])
-                        .then((value) => setState(
-                              () {},
-                            ));
-                  },
-                )
-            ]);
-          }
+      bottomNavigationBar: NavigationBar(
+        destinations: widget.routes,
+        selectedIndex: currentPageIdx,
+        onDestinationSelected: (value) {
+          setState(() {
+            currentPageIdx = value;
+            title = widget.routes[value].label;
+          });
         },
       ),
+      body: [
+        FutureBuilder(
+          future: fetchBrand(),
+          builder: (context, snapshot) {
+            if (snapshot.data == null) {
+              return const Text('Loading');
+            } else {
+              return Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12.0),
+                child: ListView(children: <Widget>[
+                  for (var i = 0; i < snapshot.data!.length; i++)
+                    if (snapshot.data![i]["name"].toString().isEmpty)
+                      const SizedBox.shrink()
+                    else
+                      GestureDetector(
+                        child: Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Column(children: <Widget>[
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  Text(snapshot.data![i]["name"].toString()),
+                                  Text(snapshot.data![i]["phone"].toString())
+                                ],
+                              )
+                            ]),
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.of(context)
+                              .pushNamed("/create_update_brand",
+                                  arguments: snapshot.data![i])
+                              .then((value) => setState(
+                                    () {},
+                                  ));
+                        },
+                      )
+                ]),
+              );
+            }
+          },
+        )
+      ][currentPageIdx],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CreateUpdateBrand()));
+              builder: (context) => const CreateUpdateProduct()));
         },
         tooltip: 'Add',
         child: const Icon(Icons.add),
