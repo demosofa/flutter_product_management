@@ -3,13 +3,13 @@ import 'package:sqflite/sqflite.dart';
 
 class SQLiteHelper {
   static Database? _db;
-  static const String tableUser =
+  static const String _tableUser =
       'CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY, name TEXT, phone TEXT, address TEXT, note TEXT, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)';
 
-  static const tableBrand =
+  static const dynamic _tableBrand =
       'CREATE TABLE IF NOT EXISTS Brand (id INTEGER PRIMARY KEY, name TEXT, phone TEXT, address TEXT, note TEXT, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)';
 
-  static const tableProduct =
+  static const _tableProduct =
       'CREATE TABLE IF NOT EXISTS Product (id INTEGER PRIMARY KEY, name TEXT, note TEXT, cost INTEGER, price INTEGER, init INTEGER, sold INTEGER DEFAULT 0 NOT NULL, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, brandId INTEGER NOT NULL, FOREIGN KEY (brandId) REFERENCES Brand (id))';
 
   static Future<Database?> open({int version = 1}) async {
@@ -18,10 +18,13 @@ class SQLiteHelper {
       _db = await openDatabase(
         dbPath,
         version: version,
+        onConfigure: (db) async {
+          await db.execute('PRAGMA foreign_keys = ON');
+        },
         onCreate: (db, version) async {
-          await db.execute(tableUser);
-          await db.execute(tableBrand);
-          await db.execute(tableProduct);
+          await db.execute(_tableUser);
+          await db.execute(_tableBrand);
+          await db.execute(_tableProduct);
         },
       );
       // final check = await _db!.rawQuery(

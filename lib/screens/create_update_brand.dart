@@ -16,9 +16,10 @@ class CreateUpdateBrand extends StatefulWidget {
 }
 
 class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
-  final _formKey = GlobalKey<FormState>();
   Brand brand = Brand();
   String title = "Tạo Thương Hiệu";
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -32,58 +33,52 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
   }
 
   Future<void> create() async {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      final db = await SQLiteHelper.open();
-      if (widget.data != null) {
-        await db!.transaction((txn) async {
-          await txn.update("Brand", brand.toMap(),
-              where: "id = ?", whereArgs: [widget.data?.id]);
-        });
-        showDialog(
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+
+    final db = await SQLiteHelper.open();
+    await db!.transaction((txn) async {
+      if (widget.data == null) {
+        await txn.insert("Brand", brand.toMap()).then((_) => showDialog(
             context: context,
-            builder: ((context) {
-              return Dialog(
-                  child: SizedBox(
-                width: 200,
-                height: 150,
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Flex(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      direction: Axis.vertical,
-                      children: <Widget>[
-                        const Text("Thành công thêm Thương hiệu mới"),
-                        Text(jsonEncode(brand.toMap())),
-                        Wrap(
-                          children: <Widget>[
-                            TextButton(
-                                onPressed: (() {
-                                  Navigator.pop(context);
-                                }),
-                                child: const Text("Ok"))
-                          ],
-                        )
-                      ],
-                    )),
-              ));
-            }));
+            builder: ((context) => Dialog(
+                    child: SizedBox(
+                  width: 200,
+                  height: 150,
+                  child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Flex(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        direction: Axis.vertical,
+                        children: <Widget>[
+                          const Text("Thành công thêm Thương hiệu mới"),
+                          Text(jsonEncode(brand.toMap())),
+                          Wrap(
+                            children: <Widget>[
+                              TextButton(
+                                  onPressed: (() {
+                                    Navigator.pop(context);
+                                  }),
+                                  child: const Text("Ok"))
+                            ],
+                          )
+                        ],
+                      )),
+                )))));
       } else {
-        await db!.transaction((txn) async {
-          await txn.insert("Brand", brand.toMap());
-        });
+        await txn.update("Brand", brand.toMap(),
+            where: "id = ?", whereArgs: [brand.id]);
       }
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
+      resizeToAvoidBottomInset: false,
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30.0),
         child: Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -91,11 +86,12 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                 children: <Widget>[
                   TextFormField(
                     decoration: const InputDecoration(
-                        hintText: "Tên thương hiệu",
+                        labelText: "Tên thương hiệu",
                         prefixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.person),
-                        )),
+                        ),
+                        border: OutlineInputBorder()),
                     keyboardType: TextInputType.name,
                     inputFormatters: [LengthLimitingTextInputFormatter(25)],
                     initialValue: brand.name,
@@ -110,11 +106,12 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                   const SizedBox(height: 10),
                   TextFormField(
                     decoration: const InputDecoration(
-                        hintText: "Địa chỉ nhập hàng",
+                        labelText: "Địa chỉ nhập hàng",
                         prefixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.streetview),
-                        )),
+                        ),
+                        border: OutlineInputBorder()),
                     keyboardType: TextInputType.streetAddress,
                     inputFormatters: [LengthLimitingTextInputFormatter(100)],
                     initialValue: brand.address,
@@ -129,11 +126,12 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                   const SizedBox(height: 10),
                   TextFormField(
                     decoration: const InputDecoration(
-                        hintText: "Số điện thoại",
+                        labelText: "Số điện thoại",
                         prefixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.phone),
-                        )),
+                        ),
+                        border: OutlineInputBorder()),
                     keyboardType: TextInputType.phone,
                     inputFormatters: [
                       MaskTextInputFormatter(
@@ -153,11 +151,12 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                   const SizedBox(height: 10),
                   TextFormField(
                     decoration: const InputDecoration(
-                        hintText: "Chú ý",
+                        labelText: "Chú ý",
                         prefixIcon: Padding(
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.note),
-                        )),
+                        ),
+                        border: OutlineInputBorder()),
                     maxLines: null,
                     keyboardType: TextInputType.multiline,
                     inputFormatters: [LengthLimitingTextInputFormatter(200)],
