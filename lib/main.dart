@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
 
   Route<dynamic>? generateRoute(RouteSettings settings) {
     final List<String> pathElements = settings.name!.split("/");
-    inspect(pathElements);
+    inspect(settings.arguments);
 
     if (pathElements[0] != "") return null;
 
@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
         return PageRouteBuilder(
           pageBuilder: ((context, animation, secondaryAnimation) {
             return CreateUpdateBrand(
-              data: Brand().fromMap(settings.arguments as Map<String, dynamic>),
+              data: settings.arguments as Brand,
             );
           }),
           transitionsBuilder: (context, animation, secondaryAnimation, child) =>
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       case 'create_update_product':
         return MaterialPageRoute(builder: ((context) {
           return CreateUpdateProduct(
-            data: Product().fromMap(settings.arguments as Map<String, dynamic>),
+            data: settings.arguments as Product,
           );
         }));
       default:
@@ -85,6 +85,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int currentPageIdx = 0;
   String title = "Demo";
+  String dropdownBrand = "All";
 
   @override
   void initState() {
@@ -112,6 +113,22 @@ class _MyHomePageState extends State<MyHomePage> {
     return lstBrand;
   }
 
+  Future<List<Map<String, Object?>>> fetchProduct(String brand) async {
+    List<Map<String, Object?>> lstProduct = [];
+    final db = await SQLiteHelper.open();
+    if (db != null && db.isOpen == true) {
+      await db.transaction((txn) async {
+        if (brand == "All") {
+          lstProduct = await txn.query("Product");
+        } else {
+          lstProduct = await txn
+              .query("Product", where: "brandId = ?", whereArgs: [brand]);
+        }
+      });
+    }
+    return lstProduct;
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called
@@ -132,49 +149,91 @@ class _MyHomePageState extends State<MyHomePage> {
         },
       ),
       body: [
-        FutureBuilder(
-          future: fetchBrand(),
-          builder: (context, snapshot) {
-            if (snapshot.data == null) {
-              return const Text('Loading');
-            } else {
-              return Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12.0),
-                child: ListView(children: <Widget>[
-                  for (var i = 0; i < snapshot.data!.length; i++)
-                    if (snapshot.data![i]["name"].toString().isEmpty)
-                      const SizedBox.shrink()
-                    else
-                      GestureDetector(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Column(children: <Widget>[
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  Text(snapshot.data![i]["name"].toString()),
-                                  Text(snapshot.data![i]["phone"].toString())
-                                ],
-                              )
-                            ]),
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              FutureBuilder(
+                future: fetchBrand(),
+                builder: (context, snapshot) {
+                  if (snapshot.data == null) {
+                    return const Text('Loading');
+                  } else if (snapshot.data != null && snapshot.data!.isEmpty) {
+                    return const SizedBox.shrink();
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 5.0),
+                      child: DropdownButton<String>(
+                        hint: const Text("Brand"),
+                        items: [
+                          DropdownMenuItem(
+                            value: "All",
+                            child: GestureDetector(child: const Text("All")),
                           ),
-                        ),
-                        onTap: () {
-                          Navigator.of(context)
-                              .pushNamed("/create_update_brand",
-                                  arguments: snapshot.data![i])
-                              .then((value) => setState(
-                                    () {},
-                                  ));
+                          ...snapshot.data!.map((e) {
+                            Brand brand = Brand().fromMap(e);
+                            return DropdownMenuItem<String>(
+                              value: brand.id.toString(),
+                              child: GestureDetector(
+                                  onLongPress: () {
+                                    Navigator.of(context)
+                                        .pushNamed("/create_update_brand",
+                                            arguments: brand)
+                                        .then((value) => setState(
+                                              () {},
+                                            ));
+                                  },
+                                  child: Text(brand.name.toString())),
+                            );
+                          }).toList()
+                        ],
+                        value: dropdownBrand,
+                        onChanged: (value) {
+                          setState(() {
+                            dropdownBrand = value.toString();
+                          });
                         },
-                      )
-                ]),
-              );
-            }
-          },
+                      ),
+                    );
+                  }
+                },
+              ),
+              FutureBuilder(
+                  future: fetchProduct(dropdownBrand),
+                  builder: (context, snapshot) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 15),
+                      child: snapshot.data != null
+                          ? ListView(
+                              shrinkWrap: true,
+                              children: snapshot.data!.map(
+                                (e) {
+                                  Product product = Product().fromMap(e);
+                                  return InkWell(
+                                    child: Card(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceAround,
+                                        children: <Widget>[
+                                          Text(product.name!),
+                                          Text(product.price.toString())
+                                        ],
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .pushNamed("/create_update_product",
+                                              arguments: product)
+                                          .then((value) => setState(() {}));
+                                    },
+                                  );
+                                },
+                              ).toList())
+                          : const Text("Loading"),
+                    );
+                  })
+            ],
+          ),
         )
       ][currentPageIdx],
       floatingActionButton: FloatingActionButton(
@@ -185,6 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Add',
         child: const Icon(Icons.add),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

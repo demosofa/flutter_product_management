@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
+import 'package:product_manager/models/brand.dart';
 import 'package:product_manager/models/product.dart';
 import 'package:string_validator/string_validator.dart';
 
@@ -14,7 +15,7 @@ class CreateUpdateProduct extends StatefulWidget {
 class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   Product product = Product();
   String title = "Thêm sản phẩm";
-
+  String dropdownBrand = "";
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -24,6 +25,17 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
       title = "Cập nhật sản phẩm";
     }
     super.initState();
+  }
+
+  Future<List<Map<String, Object?>>> fetchBrand() async {
+    List<Map<String, Object?>> lstBrand = [];
+    final db = await SQLiteHelper.open();
+    if (db != null && db.isOpen == true) {
+      await db.transaction((txn) async {
+        lstBrand = await txn.query("Brand");
+      });
+    }
+    return lstBrand;
   }
 
   Future<void> create() async {
@@ -55,6 +67,50 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
         child: Form(
           key: _formKey,
           child: ListView(itemExtent: 70, children: <Widget>[
+            FutureBuilder(
+              future: fetchBrand(),
+              builder: (context, snapshot) {
+                if (snapshot.data == null) {
+                  return const Text('Loading');
+                } else if (snapshot.data != null && snapshot.data!.isEmpty) {
+                  return const SizedBox.shrink();
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 5.0),
+                    child: DropdownButtonFormField<String>(
+                      hint: const Text("Brand"),
+                      items: snapshot.data!.map((e) {
+                        Brand brand = Brand().fromMap(e);
+                        return DropdownMenuItem<String>(
+                          value: brand.id.toString(),
+                          child: GestureDetector(
+                              onLongPress: () {
+                                Navigator.of(context)
+                                    .pushNamed("/create_update_brand",
+                                        arguments: brand)
+                                    .then((value) => setState(
+                                          () {},
+                                        ));
+                              },
+                              child: Text(brand.name.toString())),
+                        );
+                      }).toList(),
+                      value: dropdownBrand.isNotEmpty
+                          ? dropdownBrand
+                          : snapshot.data!.first["id"].toString(),
+                      onChanged: (value) {
+                        setState(() {
+                          dropdownBrand = value.toString();
+                        });
+                      },
+                      onSaved: (newValue) {
+                        product.brandId = int.parse(newValue!);
+                      },
+                    ),
+                  );
+                }
+              },
+            ),
             TextFormField(
               decoration: const InputDecoration(
                   labelText: "Tên sản phẩm",
