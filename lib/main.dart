@@ -210,14 +210,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                 (e) {
                                   Product product = Product().fromMap(e);
                                   return InkWell(
-                                    child: Card(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        children: <Widget>[
-                                          Text(product.name!),
-                                          Text(product.price.toString())
-                                        ],
+                                    child: SizedBox(
+                                      height: 70,
+                                      child: Card(
+                                        shape: RoundedRectangleBorder(
+                                            // side: const BorderSide(width: 1),
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
+                                        elevation: 4,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: <Widget>[
+                                            Text(product.name!),
+                                            Text(product.price.toString())
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     onTap: () {

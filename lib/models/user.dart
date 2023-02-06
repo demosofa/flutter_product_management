@@ -1,6 +1,6 @@
-import 'package:product_manager/utils/class_util.dart';
+import 'package:product_manager/utils/model_util.dart';
 
-class User implements ClassUtil {
+class User implements ModelUtil {
   int? id;
   String? name;
   String? phone;
@@ -8,6 +8,7 @@ class User implements ClassUtil {
   String? note;
 
   User();
+  User.necc(this.name, this.phone, this.address, this.note);
   User.full(this.id, this.name, this.phone, this.address, this.note);
 
   @override

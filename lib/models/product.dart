@@ -1,6 +1,6 @@
-import 'package:product_manager/utils/class_util.dart';
+import 'package:product_manager/utils/model_util.dart';
 
-class Product implements ClassUtil {
+class Product implements ModelUtil {
   int? id;
   String? name;
   String? note;

@@ -21,8 +21,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   @override
   void initState() {
     if (widget.data != null) {
-      product = widget.data!;
       title = "Cập nhật sản phẩm";
+      product = widget.data!;
+      dropdownBrand = product.brandId.toString();
     }
     super.initState();
   }
