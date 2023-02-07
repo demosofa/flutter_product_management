@@ -36,8 +36,8 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
-    final db = await SQLiteHelper.open();
-    await db!.transaction((txn) async {
+    final db = await SQLiteHelper.db;
+    await db.transaction((txn) async {
       if (widget.data == null) {
         await txn.insert("Brand", brand.toMap()).then((_) => showDialog(
             context: context,

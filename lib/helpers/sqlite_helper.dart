@@ -2,7 +2,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SQLiteHelper {
-  static Database? _db;
   static const String _tableUser =
       'CREATE TABLE IF NOT EXISTS User (id INTEGER PRIMARY KEY, name TEXT, phone TEXT, address TEXT, note TEXT, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP)';
 
@@ -12,12 +11,10 @@ class SQLiteHelper {
   static const _tableProduct =
       'CREATE TABLE IF NOT EXISTS Product (id INTEGER PRIMARY KEY, name TEXT, note TEXT, cost INTEGER, price INTEGER, init INTEGER, sold INTEGER DEFAULT 0 NOT NULL, updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP, brandId INTEGER NOT NULL, FOREIGN KEY (brandId) REFERENCES Brand (id))';
 
-  static Future<Database?> open({int version = 1}) async {
-    if (_db == null || _db!.isOpen) {
-      final String dbPath = join(await getDatabasesPath(), "gas_db");
-      _db = await openDatabase(
-        dbPath,
-        version: version,
+  static Database? _db;
+  static Future<Database> get db async => _db ??= await openDatabase(
+        join(await getDatabasesPath(), "gas_db"),
+        version: 1,
         onConfigure: (db) async {
           await db.execute('PRAGMA foreign_keys = ON');
         },
@@ -26,13 +23,12 @@ class SQLiteHelper {
           await db.execute(_tableBrand);
           await db.execute(_tableProduct);
         },
+        onOpen: (db) async {
+          // final check = await _db!.rawQuery(
+          //     "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
+          // log('check if table exists $check');
+        },
       );
-      // final check = await _db!.rawQuery(
-      //     "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
-      // log('check if table exists $check');
-    }
-    return _db;
-  }
 
   static Future<bool> close() async {
     if (_db == null || !_db!.isOpen) return false;

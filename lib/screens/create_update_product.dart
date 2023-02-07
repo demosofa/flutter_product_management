@@ -30,8 +30,8 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
 
   Future<List<Map<String, Object?>>> fetchBrand() async {
     List<Map<String, Object?>> lstBrand = [];
-    final db = await SQLiteHelper.open();
-    if (db != null && db.isOpen == true) {
+    final db = await SQLiteHelper.db;
+    if (db.isOpen == true) {
       await db.transaction((txn) async {
         lstBrand = await txn.query("Brand");
       });
@@ -43,8 +43,8 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
-    final db = await SQLiteHelper.open();
-    if (db != null && db.isOpen) {
+    final db = await SQLiteHelper.db;
+    if (db.isOpen) {
       await db.transaction((txn) async {
         if (widget.data == null) {
           await txn.insert("Product", product.toMap()).then((_) =>

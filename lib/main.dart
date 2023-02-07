@@ -101,8 +101,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<Map<String, Object?>>> fetchBrand() async {
     List<Map<String, Object?>> lstBrand = [];
-    final db = await SQLiteHelper.open();
-    if (db != null && db.isOpen == true) {
+    final db = await SQLiteHelper.db;
+    if (db.isOpen == true) {
       await db.transaction((txn) async {
         lstBrand = await txn.query("Brand");
       });
@@ -115,8 +115,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<Map<String, Object?>>> fetchProduct(String brand) async {
     List<Map<String, Object?>> lstProduct = [];
-    final db = await SQLiteHelper.open();
-    if (db != null && db.isOpen == true) {
+    final db = await SQLiteHelper.db;
+    if (db.isOpen == true) {
       await db.transaction((txn) async {
         if (brand == "All") {
           lstProduct = await txn.query("Product");
