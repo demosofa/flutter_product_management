@@ -62,9 +62,8 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      extendBodyBehindAppBar: true,
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Form(
           key: _formKey,
           child: ListView(itemExtent: 70, children: <Widget>[

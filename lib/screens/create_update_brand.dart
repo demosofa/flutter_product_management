@@ -81,94 +81,103 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30.0),
         child: Form(
             key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: <Widget>[
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "Tên thương hiệu",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Icon(Icons.person),
-                        ),
-                        border: OutlineInputBorder()),
-                    keyboardType: TextInputType.name,
-                    inputFormatters: [LengthLimitingTextInputFormatter(25)],
-                    initialValue: brand.name,
-                    onSaved: (value) {
-                      brand.name = value;
-                    },
-                    validator: (value) {
-                      if (value?.isNotEmpty == true) return null;
-                      return "Xin hãy điền tên thương hiệu";
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "Địa chỉ nhập hàng",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Icon(Icons.streetview),
-                        ),
-                        border: OutlineInputBorder()),
-                    keyboardType: TextInputType.streetAddress,
-                    inputFormatters: [LengthLimitingTextInputFormatter(100)],
-                    initialValue: brand.address,
-                    onSaved: (value) {
-                      brand.address = value;
-                    },
-                    validator: (value) {
-                      if (value?.isNotEmpty == true) return null;
-                      return "Xin hãy điền địa chỉ nhập hàng";
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "Số điện thoại",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Icon(Icons.phone),
-                        ),
-                        border: OutlineInputBorder()),
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [
-                      MaskTextInputFormatter(
-                          mask: '+# (###) ###-##-##',
-                          filter: {"#": RegExp(r'[0-9]')},
-                          type: MaskAutoCompletionType.lazy)
+            child: CustomScrollView(
+              slivers: <Widget>[
+                SliverFillRemaining(
+                  child: Column(
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Tên thương hiệu",
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.person),
+                            ),
+                            border: OutlineInputBorder()),
+                        keyboardType: TextInputType.name,
+                        inputFormatters: [LengthLimitingTextInputFormatter(25)],
+                        initialValue: brand.name,
+                        onSaved: (value) {
+                          brand.name = value;
+                        },
+                        validator: (value) {
+                          if (value?.isNotEmpty == true) return null;
+                          return "Xin hãy điền tên thương hiệu";
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Địa chỉ nhập hàng",
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.streetview),
+                            ),
+                            border: OutlineInputBorder()),
+                        keyboardType: TextInputType.streetAddress,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(100)
+                        ],
+                        initialValue: brand.address,
+                        onSaved: (value) {
+                          brand.address = value;
+                        },
+                        validator: (value) {
+                          if (value?.isNotEmpty == true) return null;
+                          return "Xin hãy điền địa chỉ nhập hàng";
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Số điện thoại",
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.phone),
+                            ),
+                            border: OutlineInputBorder()),
+                        keyboardType: TextInputType.phone,
+                        inputFormatters: [
+                          MaskTextInputFormatter(
+                              mask: '+# (###) ###-##-##',
+                              filter: {"#": RegExp(r'[0-9]')},
+                              type: MaskAutoCompletionType.lazy)
+                        ],
+                        initialValue: brand.phone,
+                        onSaved: (value) {
+                          brand.phone = value;
+                        },
+                        validator: (value) {
+                          if (value?.isNotEmpty == true) return null;
+                          return "Xin hãy điền điện thoại liên hệ nhập hàng";
+                        },
+                      ),
+                      const SizedBox(height: 10),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                            labelText: "Chú ý",
+                            prefixIcon: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              child: Icon(Icons.note),
+                            ),
+                            border: OutlineInputBorder()),
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(200)
+                        ],
+                        initialValue: brand.note,
+                        onSaved: (newValue) {
+                          brand.note = newValue;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                          onPressed: create, child: const Text("Submit"))
                     ],
-                    initialValue: brand.phone,
-                    onSaved: (value) {
-                      brand.phone = value;
-                    },
-                    validator: (value) {
-                      if (value?.isNotEmpty == true) return null;
-                      return "Xin hãy điền điện thoại liên hệ nhập hàng";
-                    },
                   ),
-                  const SizedBox(height: 10),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                        labelText: "Chú ý",
-                        prefixIcon: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                          child: Icon(Icons.note),
-                        ),
-                        border: OutlineInputBorder()),
-                    maxLines: null,
-                    keyboardType: TextInputType.multiline,
-                    inputFormatters: [LengthLimitingTextInputFormatter(200)],
-                    initialValue: brand.note,
-                    onSaved: (newValue) {
-                      brand.note = newValue;
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(onPressed: create, child: const Text("Submit"))
-                ],
-              ),
+                )
+              ],
             )),
       ),
     );
