@@ -17,7 +17,11 @@ class Product implements ModelUtil {
       this.sold, this.brandId);
 
   @override
-  Map<String, Object?> toMap() {
+  List<String> get props =>
+      ["id", "name", "note", "cost", "price", "init", "sold", "brandId"];
+
+  @override
+  Map<String, Object?> get toMap {
     return {
       "id": id,
       "name": name,
@@ -28,6 +32,12 @@ class Product implements ModelUtil {
       "sold": sold,
       "brandId": brandId
     };
+  }
+
+  @override
+  get(String propertyName) {
+    if (!toMap.containsKey(propertyName)) return null;
+    return toMap[propertyName];
   }
 
   @override

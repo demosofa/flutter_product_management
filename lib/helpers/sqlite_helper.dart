@@ -24,9 +24,11 @@ class SQLiteHelper {
           await db.execute(_tableProduct);
         },
         onOpen: (db) async {
-          // final check = await _db!.rawQuery(
+          // final check = await db.rawQuery(
           //     "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
           // log('check if table exists $check');
+          // log('get db path: ${db.path}');
+          // await delete();
         },
       );
 

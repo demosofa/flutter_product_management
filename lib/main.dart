@@ -86,6 +86,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int currentPageIdx = 0;
   String title = "Demo";
   String dropdownBrand = "All";
+  List<String> productColumns = Product().props.sublist(1);
+  int sortIdx = 1;
+  bool isAcsending = false;
 
   @override
   void initState() {
@@ -107,22 +110,24 @@ class _MyHomePageState extends State<MyHomePage> {
         lstBrand = await txn.query("Brand");
       });
     }
-    // log('get db path: ${db!.path}');
-    // await SQLiteHelper.delete();
-    // inspect(lstBrand);
     return lstBrand;
   }
 
-  Future<List<Map<String, Object?>>> fetchProduct(String brand) async {
+  Future<List<Map<String, Object?>>> fetchProduct() async {
     List<Map<String, Object?>> lstProduct = [];
     final db = await SQLiteHelper.db;
     if (db.isOpen == true) {
       await db.transaction((txn) async {
-        if (brand == "All") {
+        if (dropdownBrand == "All") {
           lstProduct = await txn.query("Product");
         } else {
-          lstProduct = await txn
-              .query("Product", where: "brandId = ?", whereArgs: [brand]);
+          String orderQuery =
+              "${Product().props[sortIdx]} ${isAcsending ? "ASC" : "DESC"}";
+          log(orderQuery);
+          lstProduct = await txn.query("Product",
+              where: "brandId = ?",
+              whereArgs: [dropdownBrand],
+              orderBy: orderQuery);
         }
       });
     }
@@ -198,45 +203,56 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
               ),
               FutureBuilder(
-                  future: fetchProduct(dropdownBrand),
+                  future: fetchProduct(),
                   builder: (context, snapshot) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 15),
                       child: snapshot.data != null
-                          ? ListView(
-                              shrinkWrap: true,
-                              children: snapshot.data!.map(
-                                (e) {
-                                  Product product = Product().fromMap(e);
-                                  return InkWell(
-                                    child: SizedBox(
-                                      height: 70,
-                                      child: Card(
-                                        shape: RoundedRectangleBorder(
-                                            // side: const BorderSide(width: 1),
-                                            borderRadius:
-                                                BorderRadius.circular(8)),
-                                        elevation: 4,
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: <Widget>[
-                                            Text(product.name!),
-                                            Text(product.price.toString())
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .pushNamed("/create_update_product",
-                                              arguments: product)
-                                          .then((value) => setState(() {}));
+                          ? SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                  sortColumnIndex: sortIdx,
+                                  sortAscending: isAcsending,
+                                  columns: <DataColumn>[
+                                    const DataColumn(label: Text("No.")),
+                                    for (var i = 0;
+                                        i < productColumns.length;
+                                        i++)
+                                      DataColumn(
+                                        label: Text(productColumns[i]),
+                                        onSort: (columnIndex, ascending) {
+                                          setState(() {
+                                            sortIdx = columnIndex;
+                                            isAcsending = ascending;
+                                          });
+                                        },
+                                      )
+                                  ],
+                                  rows: snapshot.data!.asMap().entries.map(
+                                    (e) {
+                                      int key = e.key;
+                                      var value = e.value;
+                                      Product product =
+                                          Product().fromMap(value);
+                                      return DataRow(
+                                        cells: <DataCell>[
+                                          DataCell(Text((key + 1).toString())),
+                                          ...productColumns.map((col) =>
+                                              DataCell(Text(
+                                                  product.get(col).toString())))
+                                        ],
+                                        onLongPress: () {
+                                          Navigator.of(context)
+                                              .pushNamed(
+                                                  "/create_update_product",
+                                                  arguments: product)
+                                              .then((value) => setState(() {}));
+                                        },
+                                      );
                                     },
-                                  );
-                                },
-                              ).toList())
+                                  ).toList()),
+                            )
                           : const Text("Loading"),
                     );
                   })

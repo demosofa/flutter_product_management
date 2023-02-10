@@ -12,7 +12,10 @@ class Brand implements ModelUtil {
   Brand.full(this.id, this.name, this.phone, this.address, this.note);
 
   @override
-  Map<String, Object?> toMap() {
+  List<String> get props => ["id", "name", "phone", "address", "note"];
+
+  @override
+  Map<String, Object?> get toMap {
     return {
       "id": id,
       "name": name,
@@ -20,6 +23,12 @@ class Brand implements ModelUtil {
       "address": address,
       "note": note
     };
+  }
+
+  @override
+  get(String propertyName) {
+    if (!toMap.containsKey(propertyName)) return null;
+    return toMap[propertyName];
   }
 
   @override

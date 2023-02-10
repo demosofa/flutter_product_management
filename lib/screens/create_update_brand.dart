@@ -39,7 +39,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     final db = await SQLiteHelper.db;
     await db.transaction((txn) async {
       if (widget.data == null) {
-        await txn.insert("Brand", brand.toMap()).then((_) => showDialog(
+        await txn.insert("Brand", brand.toMap).then((_) => showDialog(
             context: context,
             builder: ((context) => Dialog(
                     child: SizedBox(
@@ -52,7 +52,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                         direction: Axis.vertical,
                         children: <Widget>[
                           const Text("Thành công thêm Thương hiệu mới"),
-                          Text(jsonEncode(brand.toMap())),
+                          Text(jsonEncode(brand.toMap)),
                           Wrap(
                             children: <Widget>[
                               TextButton(
@@ -66,7 +66,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                       )),
                 )))));
       } else {
-        await txn.update("Brand", brand.toMap(),
+        await txn.update("Brand", brand.toMap,
             where: "id = ?", whereArgs: [brand.id]);
       }
     });
@@ -140,7 +140,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                         inputFormatters: [
                           MaskTextInputFormatter(
                               mask: '+# (###) ###-##-##',
-                              filter: {"#": RegExp(r'[0-9]')},
+                              filter: {"#": RegExp(r'\d')},
                               type: MaskAutoCompletionType.lazy)
                         ],
                         initialValue: brand.phone,

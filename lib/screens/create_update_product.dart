@@ -47,11 +47,11 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     if (db.isOpen) {
       await db.transaction((txn) async {
         if (widget.data == null) {
-          await txn.insert("Product", product.toMap()).then((_) =>
+          await txn.insert("Product", product.toMap).then((_) =>
               ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Sản phẩm đã được tạo"))));
         } else {
-          await txn.update("Product", product.toMap(),
+          await txn.update("Product", product.toMap,
               where: 'id = ?', whereArgs: [product.id]);
         }
       });
@@ -66,7 +66,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: Form(
           key: _formKey,
-          child: ListView(itemExtent: 70, children: <Widget>[
+          child: ListView(itemExtent: 70, shrinkWrap: true, children: <Widget>[
             FutureBuilder(
               future: fetchBrand(),
               builder: (context, snapshot) {
@@ -76,7 +76,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                   return const SizedBox.shrink();
                 } else {
                   return Padding(
-                    padding: const EdgeInsets.only(top: 10, left: 5.0),
+                    padding: const EdgeInsets.only(left: 5.0),
                     child: DropdownButtonFormField<String>(
                       hint: const Text("Brand"),
                       items: snapshot.data!.map((e) {

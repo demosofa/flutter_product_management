@@ -1,4 +1,6 @@
 abstract class ModelUtil<T> {
-  Map<String, Object?> toMap();
+  List<String> get props;
+  Map<String, Object?> get toMap;
+  dynamic get(String propertyName);
   T fromMap(Map<String, Object?> map);
 }
