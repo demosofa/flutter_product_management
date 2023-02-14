@@ -1,4 +1,5 @@
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class SQLiteHelper {
@@ -13,7 +14,7 @@ class SQLiteHelper {
 
   static Database? _db;
   static Future<Database> get db async => _db ??= await openDatabase(
-        join(await getDatabasesPath(), "gas_db"),
+        join((await getApplicationDocumentsDirectory()).path, "gas_db"),
         version: 1,
         onConfigure: (db) async {
           await db.execute('PRAGMA foreign_keys = ON');
@@ -24,9 +25,11 @@ class SQLiteHelper {
           await db.execute(_tableProduct);
         },
         onOpen: (db) async {
-          // final check = await db.rawQuery(
+          // final check = await databaseExists(join(await getDatabasesPath(), "gas_db"));
+          // log(check.toString());
+          // final checkTable = await db.rawQuery(
           //     "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
-          // log('check if table exists $check');
+          // log('check if table exists $checkTable');
           // log('get db path: ${db.path}');
           // await delete();
         },
@@ -40,7 +43,7 @@ class SQLiteHelper {
 
   static Future<bool> delete() async {
     if (_db == null || _db!.path.isEmpty) return false;
-    await deleteDatabase(_db!.path);
+    await databaseFactory.deleteDatabase(_db!.path);
     return true;
   }
 
