@@ -1,6 +1,6 @@
 import 'package:product_manager/utils/model_util.dart';
 
-class Brand implements ModelUtil {
+class Brand extends ModelUtil {
   int? id;
   String? name;
   String? phone;
@@ -23,12 +23,6 @@ class Brand implements ModelUtil {
       "address": address,
       "note": note
     };
-  }
-
-  @override
-  get(String propertyName) {
-    if (!toMap.containsKey(propertyName)) return null;
-    return toMap[propertyName];
   }
 
   @override
