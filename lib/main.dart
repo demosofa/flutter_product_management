@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/brand.dart';
@@ -16,16 +14,15 @@ class MyApp extends StatelessWidget {
 
   Route<dynamic>? generateRoute(RouteSettings settings) {
     final List<String> pathElements = settings.name!.split("/");
-    inspect(settings.arguments);
-
     if (pathElements[0] != "") return null;
-
     switch (pathElements[1]) {
       case 'create_update_brand':
         return PageRouteBuilder(
           pageBuilder: ((context, animation, secondaryAnimation) {
             return CreateUpdateBrand(
-              data: settings.arguments as Brand,
+              data: settings.arguments != null
+                  ? settings.arguments as Brand
+                  : null,
             );
           }),
           transitionsBuilder: (context, animation, secondaryAnimation, child) =>
@@ -41,8 +38,8 @@ class MyApp extends StatelessWidget {
           );
         }));
       default:
+        return null;
     }
-    return null;
   }
 
   // This widget is the root of your application.
@@ -106,15 +103,14 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<List<Map<String, Object?>>> fetchProduct() async {
     List<Map<String, Object?>> lstProduct = [];
+    String orderQuery =
+        "${Product().props[sortIdx]} ${isAcsending ? "ASC" : "DESC"}";
     final db = await SQLiteHelper.db;
     if (db.isOpen == true) {
       await db.transaction((txn) async {
         if (dropdownBrand == "All") {
-          lstProduct = await txn.query("Product");
+          lstProduct = await txn.query("Product", orderBy: orderQuery);
         } else {
-          String orderQuery =
-              "${Product().props[sortIdx]} ${isAcsending ? "ASC" : "DESC"}";
-          log(orderQuery);
           lstProduct = await txn.query("Product",
               where: "brandId = ?",
               whereArgs: [dropdownBrand],
@@ -155,37 +151,40 @@ class _MyHomePageState extends State<MyHomePage> {
                     return const SizedBox.shrink();
                   } else {
                     return Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 5.0),
-                      child: DropdownButton<String>(
-                        hint: const Text("Brand"),
-                        items: [
-                          DropdownMenuItem(
-                            value: "All",
-                            child: GestureDetector(child: const Text("All")),
-                          ),
-                          ...snapshot.data!.map((e) {
-                            Brand brand = Brand().fromMap(e);
-                            return DropdownMenuItem<String>(
-                              value: brand.id.toString(),
-                              child: GestureDetector(
-                                  onLongPress: () {
-                                    Navigator.of(context)
-                                        .pushNamed("/create_update_brand",
-                                            arguments: brand)
-                                        .then((value) => setState(
-                                              () {},
-                                            ));
-                                  },
-                                  child: Text(brand.name.toString())),
-                            );
-                          }).toList()
-                        ],
-                        value: dropdownBrand,
-                        onChanged: (value) {
-                          setState(() {
-                            dropdownBrand = value.toString();
-                          });
-                        },
+                      padding: const EdgeInsets.only(top: 15, left: 40),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: DropdownButton<String>(
+                          hint: const Text("Brand"),
+                          items: [
+                            DropdownMenuItem(
+                              value: "All",
+                              child: GestureDetector(child: const Text("All")),
+                            ),
+                            ...snapshot.data!.map((e) {
+                              Brand brand = Brand().fromMap(e);
+                              return DropdownMenuItem<String>(
+                                value: brand.id.toString(),
+                                child: GestureDetector(
+                                    onLongPress: () {
+                                      Navigator.of(context)
+                                          .pushNamed("/create_update_brand",
+                                              arguments: brand)
+                                          .then((value) => setState(
+                                                () {},
+                                              ));
+                                    },
+                                    child: Text(brand.name.toString())),
+                              );
+                            }).toList()
+                          ],
+                          value: dropdownBrand,
+                          onChanged: (value) {
+                            setState(() {
+                              dropdownBrand = value.toString();
+                            });
+                          },
+                        ),
                       ),
                     );
                   }
@@ -253,8 +252,10 @@ class _MyHomePageState extends State<MyHomePage> {
       ][currentPageIdx],
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CreateUpdateProduct()));
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+                  builder: (context) => const CreateUpdateProduct()))
+              .then((value) => setState(() {}));
         },
         tooltip: 'Add',
         child: const Icon(Icons.add),

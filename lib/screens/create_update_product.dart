@@ -62,161 +62,176 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
         child: Form(
-          key: _formKey,
-          child: ListView(itemExtent: 70, shrinkWrap: true, children: <Widget>[
-            FutureBuilder(
-              future: fetchBrand(),
-              builder: (context, snapshot) {
-                if (snapshot.data == null) {
-                  return const Text('Loading');
-                } else if (snapshot.data != null && snapshot.data!.isEmpty) {
-                  return const SizedBox.shrink();
-                } else {
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 5.0),
-                    child: DropdownButtonFormField<String>(
-                      hint: const Text("Brand"),
-                      items: snapshot.data!.map((e) {
-                        Brand brand = Brand().fromMap(e);
-                        return DropdownMenuItem<String>(
-                          value: brand.id.toString(),
-                          child: GestureDetector(
-                              onLongPress: () {
-                                Navigator.of(context)
-                                    .pushNamed("/create_update_brand",
-                                        arguments: brand)
-                                    .then((value) => setState(
-                                          () {},
-                                        ));
-                              },
-                              child: Text(brand.name.toString())),
+            key: _formKey,
+            child: Wrap(
+                alignment: WrapAlignment.center,
+                runSpacing: 10,
+                children: <Widget>[
+                  FutureBuilder(
+                    future: fetchBrand(),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == null) {
+                        return const Text('Loading');
+                      } else if (snapshot.data != null &&
+                          snapshot.data!.isEmpty) {
+                        return AlertDialog(
+                          title: const Text("There is any available Brand"),
+                          content:
+                              const Text("Do you want to create new Brand?"),
+                          actions: [
+                            OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pushNamed("/create_update_brand")
+                                      .then((value) => setState(() {}));
+                                },
+                                child: const Text("Ok"))
+                          ],
                         );
-                      }).toList(),
-                      value: dropdownBrand.isNotEmpty
-                          ? dropdownBrand
-                          : snapshot.data!.first["id"].toString(),
-                      onChanged: (value) {
-                        setState(() {
-                          dropdownBrand = value.toString();
-                        });
-                      },
-                      onSaved: (newValue) {
-                        product.brandId = int.parse(newValue!);
-                      },
-                    ),
-                  );
-                }
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                  labelText: "Tên sản phẩm",
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Icon(Icons.person),
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          child: DropdownButtonFormField<String>(
+                            hint: const Text("Brand"),
+                            items: snapshot.data!.map((e) {
+                              Brand brand = Brand().fromMap(e);
+                              return DropdownMenuItem<String>(
+                                value: brand.id.toString(),
+                                child: GestureDetector(
+                                    onLongPress: () {
+                                      Navigator.of(context)
+                                          .pushNamed("/create_update_brand",
+                                              arguments: brand)
+                                          .then((value) => setState(
+                                                () {},
+                                              ));
+                                    },
+                                    child: Text(brand.name.toString())),
+                              );
+                            }).toList(),
+                            value: dropdownBrand.isNotEmpty
+                                ? dropdownBrand
+                                : snapshot.data!.first["id"].toString(),
+                            onChanged: (value) {
+                              setState(() {
+                                dropdownBrand = value.toString();
+                              });
+                            },
+                            onSaved: (newValue) {
+                              product.brandId = int.parse(newValue!);
+                            },
+                          ),
+                        );
+                      }
+                    },
                   ),
-                  border: OutlineInputBorder()),
-              keyboardType: TextInputType.name,
-              inputFormatters: [LengthLimitingTextInputFormatter(25)],
-              initialValue: product.name,
-              onSaved: (value) {
-                product.name = value;
-              },
-              validator: (value) {
-                if (value?.isNotEmpty == true) return null;
-                return "Xin hãy điền tên sản phẩm";
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                  labelText: "Chi phí",
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Icon(Icons.currency_exchange),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Tên sản phẩm",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.person),
+                        ),
+                        border: OutlineInputBorder()),
+                    keyboardType: TextInputType.name,
+                    inputFormatters: [LengthLimitingTextInputFormatter(25)],
+                    initialValue: product.name,
+                    onSaved: (value) {
+                      product.name = value;
+                    },
+                    validator: (value) {
+                      if (value?.isNotEmpty == true) return null;
+                      return "Xin hãy điền tên sản phẩm";
+                    },
                   ),
-                  border: OutlineInputBorder()),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              initialValue: product.cost.toString(),
-              onSaved: (value) {
-                product.cost = int.parse(value!);
-              },
-              validator: (value) {
-                if (value!.isNotEmpty == true || !isNumeric(value)) {
-                  return null;
-                }
-                return "Xin hãy điền chi phí";
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                  labelText: "Giá cả",
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Icon(Icons.price_change),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Chi phí",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.currency_exchange),
+                        ),
+                        border: OutlineInputBorder()),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    initialValue: product.cost.toString(),
+                    onSaved: (value) {
+                      product.cost = int.parse(value!);
+                    },
+                    validator: (value) {
+                      if (value!.isNotEmpty == true || !isNumeric(value)) {
+                        return null;
+                      }
+                      return "Xin hãy điền chi phí";
+                    },
                   ),
-                  border: OutlineInputBorder()),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              initialValue: product.price.toString(),
-              onSaved: (value) {
-                product.price = int.parse(value!);
-              },
-              validator: (value) {
-                if (value?.isNotEmpty == true) return null;
-                return "Xin hãy điền giá cả";
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                  labelText: "Số lượng nhập hàng",
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Icon(Icons.currency_exchange),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Giá cả",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.price_change),
+                        ),
+                        border: OutlineInputBorder()),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    initialValue: product.price.toString(),
+                    onSaved: (value) {
+                      product.price = int.parse(value!);
+                    },
+                    validator: (value) {
+                      if (value?.isNotEmpty == true) return null;
+                      return "Xin hãy điền giá cả";
+                    },
                   ),
-                  border: OutlineInputBorder()),
-              keyboardType: TextInputType.number,
-              inputFormatters: [
-                FilteringTextInputFormatter.digitsOnly,
-              ],
-              initialValue: product.cost.toString(),
-              onSaved: (value) {
-                product.cost = int.parse(value!);
-              },
-              validator: (value) {
-                if (value!.isNotEmpty == true || !isNumeric(value)) {
-                  return null;
-                }
-                return "Xin hãy điền số lượng nhập hàng";
-              },
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                  labelText: "Chú ý",
-                  prefixIcon: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10),
-                    child: Icon(Icons.note),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Số lượng nhập hàng",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.currency_exchange),
+                        ),
+                        border: OutlineInputBorder()),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    initialValue: product.cost.toString(),
+                    onSaved: (value) {
+                      product.cost = int.parse(value!);
+                    },
+                    validator: (value) {
+                      if (value!.isNotEmpty == true || !isNumeric(value)) {
+                        return null;
+                      }
+                      return "Xin hãy điền số lượng nhập hàng";
+                    },
                   ),
-                  border: OutlineInputBorder()),
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-              inputFormatters: [LengthLimitingTextInputFormatter(200)],
-              initialValue: product.note,
-              onSaved: (newValue) {
-                product.note = newValue;
-              },
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: create, child: const Text("Submit"))
-          ]),
-        ),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Chú ý",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.note),
+                        ),
+                        border: OutlineInputBorder()),
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    inputFormatters: [LengthLimitingTextInputFormatter(200)],
+                    initialValue: product.note,
+                    onSaved: (newValue) {
+                      product.note = newValue;
+                    },
+                  ),
+                  ElevatedButton(onPressed: create, child: const Text("Submit"))
+                ])),
       ),
     );
   }
