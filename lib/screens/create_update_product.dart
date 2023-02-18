@@ -94,35 +94,49 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                       } else {
                         return Padding(
                           padding: const EdgeInsets.only(left: 5.0),
-                          child: DropdownButtonFormField<String>(
-                            hint: const Text("Brand"),
-                            items: snapshot.data!.map((e) {
-                              Brand brand = Brand().fromMap(e);
-                              return DropdownMenuItem<String>(
-                                value: brand.id.toString(),
-                                child: GestureDetector(
-                                    onLongPress: () {
-                                      Navigator.of(context)
-                                          .pushNamed("/create_update_brand",
-                                              arguments: brand)
-                                          .then((value) => setState(
-                                                () {},
-                                              ));
-                                    },
-                                    child: Text(brand.name.toString())),
-                              );
-                            }).toList(),
-                            value: dropdownBrand.isNotEmpty
-                                ? dropdownBrand
-                                : snapshot.data!.first["id"].toString(),
-                            onChanged: (value) {
-                              setState(() {
-                                dropdownBrand = value.toString();
-                              });
-                            },
-                            onSaved: (newValue) {
-                              product.brandId = int.parse(newValue!);
-                            },
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  hint: const Text("Brand"),
+                                  items: snapshot.data!.map((e) {
+                                    Brand brand = Brand().fromMap(e);
+                                    return DropdownMenuItem<String>(
+                                      value: brand.id.toString(),
+                                      child: GestureDetector(
+                                          onLongPress: () {
+                                            Navigator.of(context)
+                                                .pushNamed(
+                                                    "/create_update_brand",
+                                                    arguments: brand)
+                                                .then((value) => setState(
+                                                      () {},
+                                                    ));
+                                          },
+                                          child: Text(brand.name.toString())),
+                                    );
+                                  }).toList(),
+                                  value: dropdownBrand.isNotEmpty
+                                      ? dropdownBrand
+                                      : snapshot.data!.first["id"].toString(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      dropdownBrand = value.toString();
+                                    });
+                                  },
+                                  onSaved: (newValue) {
+                                    product.brandId = int.parse(newValue!);
+                                  },
+                                ),
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                            context, "/create_update_brand")
+                                        .then((value) => setState(() {}));
+                                  },
+                                  child: const Text("Tạo thương hiệu mới"))
+                            ],
                           ),
                         );
                       }

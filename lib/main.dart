@@ -12,7 +12,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  Route<dynamic>? generateRoute(RouteSettings settings) {
+  Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     final List<String> pathElements = settings.name!.split("/");
     if (pathElements[0] != "") return null;
     switch (pathElements[1]) {
@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
           pageTransitionsTheme: const PageTransitionsTheme(builders: {
             TargetPlatform.android: ZoomPageTransitionsBuilder()
           })),
-      onGenerateRoute: generateRoute,
+      onGenerateRoute: onGenerateRoute,
       home: MyHomePage(),
     );
   }
