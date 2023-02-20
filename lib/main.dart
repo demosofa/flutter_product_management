@@ -80,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+    super.initState();
     setState(() {
       if (widget.title != null) {
         title = widget.title!;
@@ -87,7 +88,6 @@ class _MyHomePageState extends State<MyHomePage> {
         title = widget.routes[currentPageIdx].label;
       }
     });
-    super.initState();
   }
 
   Future<List<Map<String, Object?>>> fetchBrand() async {
@@ -174,7 +174,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 () {},
                                               ));
                                     },
-                                    child: Text(brand.name.toString())),
+                                    child: Text(brand.name!)),
                               );
                             }).toList()
                           ],

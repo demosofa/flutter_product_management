@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/brand.dart';
@@ -20,12 +21,12 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
 
   @override
   void initState() {
+    super.initState();
     if (widget.data != null) {
       title = "Cập nhật sản phẩm";
       product = widget.data!;
       dropdownBrand = product.brandId.toString();
     }
-    super.initState();
   }
 
   Future<List<Map<String, Object?>>> fetchBrand() async {
@@ -35,6 +36,37 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
       await db.transaction((txn) async {
         lstBrand = await txn.query("Brand");
       });
+    }
+    if (lstBrand.isEmpty && context.mounted) {
+      await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text("There is any available Brand"),
+                content: const Text("Do you want to create new Brand?"),
+                actions: [
+                  OutlinedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      },
+                      child: const Text("Cancel")),
+                  OutlinedButton(
+                      onPressed: () {
+                        SchedulerBinding.instance.addPostFrameCallback((_) {
+                          Navigator.of(context)
+                              .pushNamed("/create_update_brand")
+                              .then((value) {
+                            Navigator.pop(context);
+                            WidgetsBinding.instance
+                                .addPostFrameCallback((timeStamp) {
+                              setState(() {});
+                            });
+                          });
+                        });
+                      },
+                      child: const Text("Ok")),
+                ],
+              ));
     }
     return lstBrand;
   }
@@ -77,20 +109,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                         return const Text('Loading');
                       } else if (snapshot.data != null &&
                           snapshot.data!.isEmpty) {
-                        return AlertDialog(
-                          title: const Text("There is any available Brand"),
-                          content:
-                              const Text("Do you want to create new Brand?"),
-                          actions: [
-                            OutlinedButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pushNamed("/create_update_brand")
-                                      .then((value) => setState(() {}));
-                                },
-                                child: const Text("Ok"))
-                          ],
-                        );
+                        return const SizedBox.shrink();
                       } else {
                         return Padding(
                           padding: const EdgeInsets.only(left: 5.0),

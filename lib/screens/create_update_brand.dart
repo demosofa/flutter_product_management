@@ -23,13 +23,13 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
 
   @override
   void initState() {
+    super.initState();
     if (widget.data != null) {
       setState(() {
         title = "Cập nhật Thương Hiệu";
         brand = widget.data!;
       });
     }
-    super.initState();
   }
 
   Future<void> create() async {
@@ -42,7 +42,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         await txn.insert("Brand", brand.toMap).then((_) => showDialog(
             context: context,
             useRootNavigator: false,
-            builder: ((context) => Dialog(
+            builder: (context) => Dialog(
                     child: SizedBox(
                   width: 200,
                   height: 150,
@@ -65,7 +65,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                           )
                         ],
                       )),
-                )))));
+                ))));
       } else {
         await txn.update("Brand", brand.toMap,
             where: "id = ?", whereArgs: [brand.id]);
@@ -73,10 +73,28 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     });
   }
 
+  Future<void> delete() async {
+    final db = await SQLiteHelper.db;
+    if (db.isOpen && context.mounted) {
+      await db.transaction((txn) async {
+        await txn.delete("Brand", where: "id = ?", whereArgs: [brand.id]);
+      }).then((value) => Navigator.pop(context));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(title)),
+        appBar: AppBar(
+          title: Text(title),
+          actions: [
+            if (widget.data != null)
+              InkWell(
+                onTap: delete,
+                child: const Icon(Icons.delete),
+              )
+          ],
+        ),
         resizeToAvoidBottomInset: false,
         body: CustomScrollView(
           slivers: <Widget>[
