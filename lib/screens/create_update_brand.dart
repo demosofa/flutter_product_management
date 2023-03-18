@@ -41,7 +41,6 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
       if (widget.data == null) {
         await txn.insert("Brand", brand.toMap).then((_) => showDialog(
             context: context,
-            useRootNavigator: false,
             builder: (context) => Dialog(
                     child: SizedBox(
                   width: 200,

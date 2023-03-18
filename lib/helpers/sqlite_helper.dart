@@ -24,15 +24,15 @@ class SQLiteHelper {
           await db.execute(_tableBrand);
           await db.execute(_tableProduct);
         },
-        onOpen: (db) async {
-          // final check = await databaseExists(join(await getDatabasesPath(), "gas_db"));
-          // log(check.toString());
-          // final checkTable = await db.rawQuery(
-          //     "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
-          // log('check if table exists $checkTable');
-          // log('get db path: ${db.path}');
-          // await delete();
-        },
+        // onOpen: (db) async {
+        //   final check = await databaseExists(join(await getDatabasesPath(), "gas_db"));
+        //   log(check.toString());
+        //   final checkTable = await db.rawQuery(
+        //       "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='Brand'");
+        //   log('check if table exists $checkTable');
+        //   log('get db path: ${db.path}');
+        //   await delete();
+        // },
       );
 
   static Future<bool> close() async {

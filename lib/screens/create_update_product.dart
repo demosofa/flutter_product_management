@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/brand.dart';
@@ -30,6 +29,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   }
 
   Future<List<Map<String, Object?>>> fetchBrand() async {
+    // await Future.delayed(const Duration(microseconds: 1));
     List<Map<String, Object?>> lstBrand = [];
     final db = await SQLiteHelper.db;
     if (db.isOpen == true) {
@@ -52,16 +52,11 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                       child: const Text("Cancel")),
                   OutlinedButton(
                       onPressed: () {
-                        SchedulerBinding.instance.addPostFrameCallback((_) {
-                          Navigator.of(context)
-                              .pushNamed("/create_update_brand")
-                              .then((value) {
-                            Navigator.pop(context);
-                            WidgetsBinding.instance
-                                .addPostFrameCallback((timeStamp) {
-                              setState(() {});
-                            });
-                          });
+                        Navigator.of(context)
+                            .pushNamed("/create_update_brand")
+                            .then((value) {
+                          Navigator.pop(context);
+                          setState(() {});
                         });
                       },
                       child: const Text("Ok")),
@@ -128,9 +123,10 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                                                 .pushNamed(
                                                     "/create_update_brand",
                                                     arguments: brand)
-                                                .then((value) => setState(
-                                                      () {},
-                                                    ));
+                                                .then((value) {
+                                              Navigator.pop(context);
+                                              setState(() {});
+                                            });
                                           },
                                           child: Text(brand.name.toString())),
                                     );
