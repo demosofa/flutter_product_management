@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String dropdownBrand = "All";
   List<String> productColumns = Product().props.sublist(1);
   int sortIdx = 1;
-  bool isAcsending = false;
+  bool isAscending = false;
 
   @override
   void initState() {
@@ -104,7 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<Map<String, Object?>>> fetchProduct() async {
     List<Map<String, Object?>> lstProduct = [];
     String orderQuery =
-        "${Product().props[sortIdx]} ${isAcsending ? "ASC" : "DESC"}";
+        "${Product().props[sortIdx]} ${isAscending ? "ASC" : "DESC"}";
     final db = await SQLiteHelper.db;
     if (db.isOpen == true) {
       await db.transaction((txn) async {
@@ -203,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             children: <Widget>[
                               DataTable(
                                   sortColumnIndex: sortIdx,
-                                  sortAscending: isAcsending,
+                                  sortAscending: isAscending,
                                   columns: <DataColumn>[
                                     const DataColumn(label: Text("No.")),
                                     for (var i = 0;
@@ -214,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         onSort: (columnIndex, ascending) {
                                           setState(() {
                                             sortIdx = columnIndex;
-                                            isAcsending = ascending;
+                                            isAscending = ascending;
                                           });
                                         },
                                       )

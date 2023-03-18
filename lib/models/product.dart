@@ -11,8 +11,8 @@ class Product extends ModelUtil {
   int? brandId;
 
   Product();
-  Product.necc(this.name, this.note, this.cost, this.price, this.init,
-      this.sold, this.brandId);
+  Product.nec(this.name, this.note, this.cost, this.price, this.init, this.sold,
+      this.brandId);
   Product.full(this.id, this.name, this.note, this.cost, this.price, this.init,
       this.sold, this.brandId);
 

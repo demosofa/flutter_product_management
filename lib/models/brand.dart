@@ -8,7 +8,7 @@ class Brand extends ModelUtil {
   String? note;
 
   Brand();
-  Brand.necc(this.name, this.phone, this.address, this.note);
+  Brand.nec(this.name, this.phone, this.address, this.note);
   Brand.full(this.id, this.name, this.phone, this.address, this.note);
 
   @override

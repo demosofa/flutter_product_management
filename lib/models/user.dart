@@ -8,7 +8,7 @@ class User extends ModelUtil {
   String? note;
 
   User();
-  User.necc(this.name, this.phone, this.address, this.note);
+  User.nec(this.name, this.phone, this.address, this.note);
   User.full(this.id, this.name, this.phone, this.address, this.note);
 
   @override
