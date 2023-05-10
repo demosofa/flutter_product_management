@@ -8,33 +8,35 @@ class ImageHelper {
       : _imagePicker = imagePicker ?? ImagePicker(),
         _imageCropper = imageCropper ?? ImageCropper();
 
-  Future<List<XFile?>> pickImage(
-      {ImageSource source = ImageSource.gallery,
-      double? maxWidth,
-      double? maxHeight,
-      CameraDevice preferredCameraDevice = CameraDevice.rear,
-      bool requestFullMetadata = true,
-      int imageQuality = 100,
-      bool multiple = false}) async {
-    if (multiple) {
-      return _imagePicker.pickMultiImage(
-          imageQuality: imageQuality,
+  Future<XFile?> pick({
+    ImageSource source = ImageSource.gallery,
+    double? maxWidth,
+    double? maxHeight,
+    int imageQuality = 100,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+    bool requestFullMetadata = true,
+  }) =>
+      _imagePicker.pickImage(
+          source: source,
           maxHeight: maxHeight,
           maxWidth: maxWidth,
+          imageQuality: imageQuality,
+          preferredCameraDevice: preferredCameraDevice,
           requestFullMetadata: requestFullMetadata);
-    }
-    final file = await _imagePicker.pickImage(
-        source: source,
-        maxHeight: maxHeight,
-        maxWidth: maxWidth,
-        imageQuality: imageQuality,
-        preferredCameraDevice: preferredCameraDevice,
-        requestFullMetadata: requestFullMetadata);
-    if (file == null) return [];
-    return [file];
-  }
 
-  Future<CroppedFile?> cropImage({
+  Future<List<XFile?>> pickMultiple({
+    double? maxWidth,
+    double? maxHeight,
+    int imageQuality = 100,
+    bool requestFullMetadata = true,
+  }) =>
+      _imagePicker.pickMultiImage(
+          maxHeight: maxHeight,
+          maxWidth: maxWidth,
+          imageQuality: imageQuality,
+          requestFullMetadata: requestFullMetadata);
+
+  Future<CroppedFile?> crop({
     required XFile file,
     int? maxWidth,
     int? maxHeight,

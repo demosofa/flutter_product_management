@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         return PageRouteBuilder(
           pageBuilder: ((context, animation, secondaryAnimation) {
             return CreateUpdateBrand(
-              data: settings.arguments != null
+              iniData: settings.arguments != null
                   ? settings.arguments as Brand
                   : null,
             );
@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
       case 'create_update_product':
         return MaterialPageRoute(builder: ((context) {
           return CreateUpdateProduct(
-            data: settings.arguments as Product,
+            iniData: settings.arguments as Product,
           );
         }));
       default:
@@ -93,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<List<Map<String, Object?>>> fetchBrand() async {
     List<Map<String, Object?>> lstBrand = [];
     final db = await SQLiteHelper.db;
-    if (db.isOpen == true) {
+    if (db.isOpen) {
       await db.transaction((txn) async {
         lstBrand = await txn.query("Brand");
       });
@@ -106,7 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String orderQuery =
         "${Product().props[sortIdx]} ${isAscending ? "ASC" : "DESC"}";
     final db = await SQLiteHelper.db;
-    if (db.isOpen == true) {
+    if (db.isOpen) {
       await db.transaction((txn) async {
         if (dropdownBrand == "All") {
           lstProduct = await txn.query("Product", orderBy: orderQuery);

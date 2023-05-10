@@ -1,42 +1,41 @@
 import 'package:product_manager/utils/model_util.dart';
 
-class Product extends ModelUtil {
+class Product extends ModelUtil<Product> {
   int? id;
   String? name;
   String? note;
-  int cost = 0;
   int price = 0;
+  int cost = 0;
   int init = 0;
   int sold = 0;
   int? brandId;
 
   Product();
-  Product.nec(this.name, this.note, this.cost, this.price, this.init, this.sold,
+  Product.nec(this.name, this.note, this.price, this.cost, this.init, this.sold,
       this.brandId);
-  Product.full(this.id, this.name, this.note, this.cost, this.price, this.init,
+  Product.full(this.id, this.name, this.note, this.price, this.cost, this.init,
       this.sold, this.brandId);
 
   @override
   List<String> get props =>
-      ["id", "name", "note", "cost", "price", "init", "sold", "brandId"];
+      ["id", "name", "note", "price", "cost", "init", "sold", "brandId"];
 
   @override
-  Map<String, Object?> get toMap {
-    return {
-      "id": id,
-      "name": name,
-      "note": note,
-      "cost": cost,
-      "price": price,
-      "init": init,
-      "sold": sold,
-      "brandId": brandId
-    };
-  }
+  Map<String, Object?> get toMap => ({
+        "id": id,
+        "name": name,
+        "note": note,
+        "price": price,
+        "cost": cost,
+        "init": init,
+        "sold": sold,
+        "brandId": brandId
+      });
 
   @override
-  Product fromMap(Map<String, dynamic> map) {
-    return Product.full(map['id'], map['name'], map['note'], map['cost'],
-        map['price'], map['init'], map['sold'], map['brandId']);
+  Product fromMap(Map<String, dynamic>? map) {
+    if (map == null) return Product();
+    return Product.full(map['id'], map['name'], map['note'], map['price'],
+        map['cost'], map['init'], map['sold'], map['brandId']);
   }
 }

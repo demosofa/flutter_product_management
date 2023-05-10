@@ -43,6 +43,7 @@ dependencies:
   path_provider: ^2.0.12
   image_picker: ^0.8.6+1
   image_cropper: ^3.0.1
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:

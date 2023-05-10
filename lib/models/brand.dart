@@ -1,6 +1,6 @@
 import 'package:product_manager/utils/model_util.dart';
 
-class Brand extends ModelUtil {
+class Brand extends ModelUtil<Brand> {
   int? id;
   String? name;
   String? phone;
@@ -15,18 +15,17 @@ class Brand extends ModelUtil {
   List<String> get props => ["id", "name", "phone", "address", "note"];
 
   @override
-  Map<String, Object?> get toMap {
-    return {
-      "id": id,
-      "name": name,
-      "phone": phone,
-      "address": address,
-      "note": note
-    };
-  }
+  Map<String, Object?> get toMap => ({
+        "id": id,
+        "name": name,
+        "phone": phone,
+        "address": address,
+        "note": note
+      });
 
   @override
-  Brand fromMap(Map<String, dynamic> map) {
+  Brand fromMap(Map<String, dynamic>? map) {
+    if (map == null) return Brand();
     return Brand.full(
         map['id'], map['name'], map['phone'], map['address'], map['note']);
   }

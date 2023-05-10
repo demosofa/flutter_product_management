@@ -1,35 +1,55 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
+import 'package:product_manager/models/any_file.dart';
 
 import '../models/brand.dart';
+import '../helpers/image_helper.dart';
 
 class CreateUpdateBrand extends StatefulWidget {
-  final Brand? data;
-  const CreateUpdateBrand({super.key, this.data});
+  final Brand? iniData;
+  const CreateUpdateBrand({super.key, this.iniData});
 
   @override
   State<CreateUpdateBrand> createState() => _CreateUpdateBrandState();
 }
 
 class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
-  Brand brand = Brand();
   String title = "Tạo Thương Hiệu";
+  String iconTitle = "BR";
+  Brand brand = Brand();
+  String? imagePath;
+  Future<Map<String, dynamic>?>? getImg;
+  final ImageHelper _imageHelper = ImageHelper();
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    if (widget.data != null) {
+    if (widget.iniData != null) {
       setState(() {
         title = "Cập nhật Thương Hiệu";
-        brand = widget.data!;
+        brand = widget.iniData!;
+        iconTitle = brand.name!;
+        getImg = _getImg();
       });
     }
+  }
+
+  Future<Map<String, dynamic>?> _getImg() async {
+    if (widget.iniData == null) {
+      return null;
+    }
+    final db = await SQLiteHelper.db;
+    return db.query("AnyFile",
+        where: "brandId = ?", whereArgs: [brand.id]).then((value) => value[0]);
   }
 
   Future<void> create() async {
@@ -38,8 +58,9 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
 
     final db = await SQLiteHelper.db;
     await db.transaction((txn) async {
-      if (widget.data == null) {
-        await txn.insert("Brand", brand.toMap).then((_) => showDialog(
+      int? brandId;
+      if (widget.iniData == null) {
+        brandId = await txn.insert("Brand", brand.toMap).then((_) => showDialog(
             context: context,
             builder: (context) => Dialog(
                     child: SizedBox(
@@ -66,8 +87,24 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                       )),
                 ))));
       } else {
+        brandId = brand.id;
         await txn.update("Brand", brand.toMap,
-            where: "id = ?", whereArgs: [brand.id]);
+            where: "id = ?", whereArgs: [brandId]);
+      }
+      if (imagePath != null) {
+        final imageStat = await File(imagePath!).stat();
+        final imageData = await getImg;
+        final imageBrand = AnyFile().fromMap(imageData);
+        imageBrand.path = imagePath;
+        imageBrand.type = imageStat.type.toString();
+        imageBrand.size = imageStat.size;
+        imageBrand.brandId = brandId;
+        if (widget.iniData == null) {
+          await txn.insert("AnyFile", imageBrand.toMap);
+        } else {
+          await txn.update("AnyFile", imageBrand.toMap,
+              where: "id = ?", whereArgs: [imageBrand.id]);
+        }
       }
     });
   }
@@ -81,13 +118,31 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     }
   }
 
+  FileImage? loadImage(Map<String, dynamic>? data) {
+    String? path = imagePath ?? (data != null ? data[0]["path"] : null);
+    return path != null ? FileImage(File(path)) : null;
+  }
+
+  Future<void> pickImage() async {
+    final file = await _imageHelper.pick(source: ImageSource.camera);
+    if (file != null) {
+      final cropped =
+          await _imageHelper.crop(file: file, cropStyle: CropStyle.circle);
+      if (cropped != null) {
+        setState(() {
+          imagePath = cropped.path;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
           actions: [
-            if (widget.data != null)
+            if (widget.iniData != null)
               InkWell(
                 onTap: delete,
                 child: const Icon(Icons.delete),
@@ -104,6 +159,25 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                     key: _formKey,
                     child: ListView(
                       children: <Widget>[
+                        Center(
+                            child: InkWell(
+                          onTap: pickImage,
+                          child: FittedBox(
+                              child: FutureBuilder(
+                                  future: getImg,
+                                  builder: (context, snapshot) {
+                                    return CircleAvatar(
+                                      radius: 60,
+                                      foregroundImage: loadImage(snapshot.data),
+                                      child: Text(
+                                          iconTitle
+                                              .substring(0, 2)
+                                              .toUpperCase(),
+                                          style: const TextStyle(fontSize: 48)),
+                                    );
+                                  })),
+                        )),
+                        const SizedBox(height: 30),
                         TextFormField(
                           decoration: const InputDecoration(
                               labelText: "Tên thương hiệu",
@@ -117,12 +191,21 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             LengthLimitingTextInputFormatter(25)
                           ],
                           initialValue: brand.name,
+                          onChanged: (value) {
+                            if (value.length > 1) {
+                              setState(() {
+                                iconTitle = value;
+                              });
+                            }
+                          },
                           onSaved: (value) {
                             brand.name = value;
                           },
                           validator: (value) {
-                            if (value?.isNotEmpty == true) return null;
-                            return "Xin hãy điền tên thương hiệu";
+                            if (value?.isEmpty == true) {
+                              return "Xin hãy điền tên thương hiệu";
+                            }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 10),
@@ -143,8 +226,10 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             brand.address = value;
                           },
                           validator: (value) {
-                            if (value?.isNotEmpty == true) return null;
-                            return "Xin hãy điền địa chỉ nhập hàng";
+                            if (value?.isEmpty == true) {
+                              return "Xin hãy điền địa chỉ nhập hàng";
+                            }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 10),
@@ -168,8 +253,10 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             brand.phone = value;
                           },
                           validator: (value) {
-                            if (value?.isNotEmpty == true) return null;
-                            return "Xin hãy điền điện thoại liên hệ nhập hàng";
+                            if (value?.isEmpty == true) {
+                              return "Xin hãy điền điện thoại liên hệ nhập hàng";
+                            }
+                            return null;
                           },
                         ),
                         const SizedBox(height: 10),

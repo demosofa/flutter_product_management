@@ -6,8 +6,8 @@ import 'package:product_manager/models/product.dart';
 import 'package:string_validator/string_validator.dart';
 
 class CreateUpdateProduct extends StatefulWidget {
-  const CreateUpdateProduct({super.key, this.data});
-  final Product? data;
+  const CreateUpdateProduct({super.key, this.iniData});
+  final Product? iniData;
   @override
   State<CreateUpdateProduct> createState() => _CreateUpdateProductState();
 }
@@ -17,13 +17,17 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   String title = "Thêm sản phẩm";
   String dropdownBrand = "";
   final _formKey = GlobalKey<FormState>();
+  late final _costController =
+      TextEditingController(text: product.cost.toString());
+  late final _priceController =
+      TextEditingController(text: product.price.toString());
 
   @override
   void initState() {
     super.initState();
-    if (widget.data != null) {
+    if (widget.iniData != null) {
       title = "Cập nhật sản phẩm";
-      product = widget.data!;
+      product = widget.iniData!;
       dropdownBrand = product.brandId.toString();
     }
   }
@@ -32,7 +36,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     // await Future.delayed(const Duration(microseconds: 1));
     List<Map<String, Object?>> lstBrand = [];
     final db = await SQLiteHelper.db;
-    if (db.isOpen == true) {
+    if (db.isOpen) {
       await db.transaction((txn) async {
         lstBrand = await txn.query("Brand");
       });
@@ -66,6 +70,15 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     return lstBrand;
   }
 
+  Future<void> delete() async {
+    final db = await SQLiteHelper.db;
+    if (db.isOpen && context.mounted) {
+      await db.transaction((txn) async {
+        await txn.delete("Product", where: "id = ?", whereArgs: [product.id]);
+      }).then((value) => Navigator.pop(context));
+    }
+  }
+
   Future<void> create() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
@@ -73,7 +86,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     final db = await SQLiteHelper.db;
     if (db.isOpen) {
       await db.transaction((txn) async {
-        if (widget.data == null) {
+        if (widget.iniData == null) {
           await txn.insert("Product", product.toMap).then((_) =>
               ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("Sản phẩm đã được tạo"))));
@@ -88,7 +101,16 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+        actions: [
+          if (widget.iniData != null)
+            InkWell(
+              onTap: delete,
+              child: const Icon(Icons.delete),
+            )
+        ],
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
         child: Form(
@@ -172,11 +194,14 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                       product.name = value;
                     },
                     validator: (value) {
-                      if (value?.isNotEmpty == true) return null;
-                      return "Xin hãy điền tên sản phẩm";
+                      if (value?.isEmpty == true) {
+                        return "Xin hãy điền tên sản phẩm";
+                      }
+                      return null;
                     },
                   ),
                   TextFormField(
+                    controller: _costController,
                     decoration: const InputDecoration(
                         labelText: "Chi phí",
                         prefixIcon: Padding(
@@ -188,18 +213,23 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                     ],
-                    initialValue: product.cost.toString(),
                     onSaved: (value) {
                       product.cost = int.parse(value!);
                     },
                     validator: (value) {
-                      if (value!.isNotEmpty == true || !isNumeric(value)) {
-                        return null;
+                      if (value == null || value.isEmpty) {
+                        return "Xin hãy điền chi phí";
+                      } else if (!isNumeric(value) || int.parse(value) < 0) {
+                        return "Xin hãy điền giá trị là số";
+                      } else if (int.parse(value) >
+                          int.parse(_priceController.value.text)) {
+                        return "Xin hãy điền giá trị bé hơn giá trị giá cả";
                       }
-                      return "Xin hãy điền chi phí";
+                      return null;
                     },
                   ),
                   TextFormField(
+                    controller: _priceController,
                     decoration: const InputDecoration(
                         labelText: "Giá cả",
                         prefixIcon: Padding(
@@ -211,13 +241,19 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                     ],
-                    initialValue: product.price.toString(),
                     onSaved: (value) {
                       product.price = int.parse(value!);
                     },
                     validator: (value) {
-                      if (value?.isNotEmpty == true) return null;
-                      return "Xin hãy điền giá cả";
+                      if (value == null || value.isEmpty) {
+                        return "Xin hãy điền giá cả";
+                      } else if (!isNumeric(value) || int.parse(value) < 0) {
+                        return "Xin hãy điền giá trị là số";
+                      } else if (int.parse(value) <
+                          int.parse(_costController.value.text)) {
+                        return "Xin hãy điền giá trị lớn hơn giá trị chi phí";
+                      }
+                      return null;
                     },
                   ),
                   TextFormField(
@@ -232,15 +268,17 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                     ],
-                    initialValue: product.cost.toString(),
+                    initialValue: product.init.toString(),
                     onSaved: (value) {
-                      product.cost = int.parse(value!);
+                      product.init = int.parse(value!);
                     },
                     validator: (value) {
-                      if (value!.isNotEmpty == true || !isNumeric(value)) {
-                        return null;
+                      if (value == null || value.isEmpty) {
+                        return "Xin hãy điền số lượng nhập hàng";
+                      } else if (!isNumeric(value) || int.parse(value) < 0) {
+                        return "Xin hãy điền giá trị là số tự nhiên";
                       }
-                      return "Xin hãy điền số lượng nhập hàng";
+                      return null;
                     },
                   ),
                   TextFormField(

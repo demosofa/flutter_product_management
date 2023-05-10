@@ -5,7 +5,7 @@ A quick cheatsheet of useful snippet for Flutter
 <details>
 <summary>Life cycle</summary>
 
-![Flutter Lifecycle](/flutter_lifecycle.webp "Flutter Lifecycle")
+![Flutter Lifecycle](/flutter-lifecycle.webp "Flutter Lifecycle")
 
 1. `createState()`: When the Framework is instructed to build a StatefulWidget, it immediately calls `createState()`
 
