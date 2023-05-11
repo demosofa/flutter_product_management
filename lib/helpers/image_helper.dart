@@ -1,5 +1,6 @@
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 class ImageHelper {
   final ImagePicker _imagePicker;
@@ -36,8 +37,8 @@ class ImageHelper {
           imageQuality: imageQuality,
           requestFullMetadata: requestFullMetadata);
 
-  Future<CroppedFile?> crop({
-    required XFile file,
+  Future<CroppedFile?> crop(
+    XFile file, {
     int? maxWidth,
     int? maxHeight,
     CropAspectRatio? aspectRatio,
@@ -63,4 +64,28 @@ class ImageHelper {
           compressFormat: compressFormat,
           compressQuality: compressQuality,
           uiSettings: uiSettings);
+
+  Future<XFile?> compress(
+    String path,
+    String targetPath, {
+    int minWidth = 1920,
+    int minHeight = 1080,
+    int inSampleSize = 1,
+    int quality = 95,
+    int rotate = 0,
+    bool autoCorrectionAngle = true,
+    CompressFormat format = CompressFormat.jpeg,
+    bool keepExif = false,
+    int numberOfRetries = 5,
+  }) =>
+      FlutterImageCompress.compressAndGetFile(path, targetPath,
+          minWidth: minWidth,
+          minHeight: minHeight,
+          inSampleSize: inSampleSize,
+          quality: quality,
+          rotate: rotate,
+          autoCorrectionAngle: autoCorrectionAngle,
+          format: format,
+          keepExif: keepExif,
+          numberOfRetries: numberOfRetries);
 }

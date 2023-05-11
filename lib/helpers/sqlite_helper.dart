@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -81,7 +79,6 @@ class SQLiteHelper {
         join((await getApplicationDocumentsDirectory()).path, "gas_db"),
         version: 1,
         onConfigure: (db) async {
-          log("$_db");
           await db.execute('PRAGMA foreign_keys = ON');
         },
         onCreate: (db, version) async {

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/any_file.dart';
 
@@ -60,42 +61,20 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     await db.transaction((txn) async {
       int? brandId;
       if (widget.iniData == null) {
-        brandId = await txn.insert("Brand", brand.toMap).then((_) => showDialog(
-            context: context,
-            builder: (context) => Dialog(
-                    child: SizedBox(
-                  width: 200,
-                  height: 150,
-                  child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Flex(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        direction: Axis.vertical,
-                        children: <Widget>[
-                          const Text("Thành công thêm Thương hiệu mới"),
-                          Text(jsonEncode(brand.toMap)),
-                          Wrap(
-                            children: <Widget>[
-                              TextButton(
-                                  onPressed: (() {
-                                    Navigator.pop(context);
-                                  }),
-                                  child: const Text("Ok"))
-                            ],
-                          )
-                        ],
-                      )),
-                ))));
+        brandId = await txn.insert("Brand", brand.toMap);
       } else {
         brandId = brand.id;
         await txn.update("Brand", brand.toMap,
             where: "id = ?", whereArgs: [brandId]);
       }
       if (imagePath != null) {
+        String path = (await getApplicationDocumentsDirectory()).path;
+        path += imagePath!.split("/").last;
+        final compressed = await _imageHelper.compress(imagePath!, path);
         final imageStat = await File(imagePath!).stat();
         final imageData = await getImg;
         final imageBrand = AnyFile().fromMap(imageData);
-        imageBrand.path = imagePath;
+        imageBrand.path = compressed?.path;
         imageBrand.type = imageStat.type.toString();
         imageBrand.size = imageStat.size;
         imageBrand.brandId = brandId;
@@ -106,7 +85,32 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
               where: "id = ?", whereArgs: [imageBrand.id]);
         }
       }
-    });
+    }).then((_) => showDialog(
+        context: context,
+        builder: (context) => Dialog(
+                child: SizedBox(
+              width: 200,
+              height: 150,
+              child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Flex(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    direction: Axis.vertical,
+                    children: <Widget>[
+                      const Text("Thành công thêm Thương hiệu mới"),
+                      Text(jsonEncode(brand.toMap)),
+                      Wrap(
+                        children: <Widget>[
+                          TextButton(
+                              onPressed: (() {
+                                Navigator.pop(context);
+                              }),
+                              child: const Text("Ok"))
+                        ],
+                      )
+                    ],
+                  )),
+            ))));
   }
 
   Future<void> delete() async {
@@ -119,7 +123,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
   }
 
   FileImage? loadImage(Map<String, dynamic>? data) {
-    String? path = imagePath ?? (data != null ? data[0]["path"] : null);
+    final String? path = imagePath ?? (data != null ? data["path"] : null);
     return path != null ? FileImage(File(path)) : null;
   }
 
@@ -127,7 +131,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     final file = await _imageHelper.pick(source: ImageSource.camera);
     if (file != null) {
       final cropped =
-          await _imageHelper.crop(file: file, cropStyle: CropStyle.circle);
+          await _imageHelper.crop(file, cropStyle: CropStyle.circle);
       if (cropped != null) {
         setState(() {
           imagePath = cropped.path;
