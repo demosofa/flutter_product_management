@@ -4,6 +4,7 @@ import 'package:product_manager/models/product.dart';
 import 'package:product_manager/screens/create_update_brand.dart';
 import 'package:product_manager/screens/create_update_product.dart';
 import 'package:product_manager/widgets/binding/my_image_cache.dart';
+import 'package:product_manager/widgets/route_transitions/slide_route.dart';
 
 import 'screens/homepage.dart';
 
@@ -20,20 +21,11 @@ class MyApp extends StatelessWidget {
     if (pathElements[0] != "") return null;
     switch (pathElements[1]) {
       case 'create_update_brand':
-        return PageRouteBuilder(
-            pageBuilder: ((context, animation, secondaryAnimation) {
-              return CreateUpdateBrand(
-                iniData: settings.arguments != null
-                    ? settings.arguments as Brand
-                    : null,
-              );
-            }),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) =>
-                    FadeTransition(
-                      opacity: animation,
-                      child: child,
-                    ));
+        return SlideRoute(
+            page: CreateUpdateBrand(
+          iniData:
+              settings.arguments != null ? settings.arguments as Brand : null,
+        ));
       case 'create_update_product':
         return MaterialPageRoute(builder: ((context) {
           return CreateUpdateProduct(
