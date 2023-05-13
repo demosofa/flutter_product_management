@@ -1,8 +1,9 @@
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:product_manager/helpers/file_helper.dart';
 
-class ImageHelper {
+class ImageHelper with FileHelper {
   final ImagePicker _imagePicker;
   final ImageCropper _imageCropper;
   ImageHelper({ImagePicker? imagePicker, ImageCropper? imageCropper})

@@ -37,7 +37,6 @@ dependencies:
   cupertino_icons: ^1.0.2
   mask_text_input_formatter: ^2.4.0
   sqflite: ^2.2.2
-  string_validator: ^0.3.0
   path: ^1.8.2
   intl: ^0.18.0
   path_provider: ^2.0.12
@@ -45,6 +44,8 @@ dependencies:
   image_cropper: ^3.0.1
   permission_handler: ^10.2.0
   flutter_image_compress: ^2.0.2
+  archive: ^3.3.7
+  string_validator: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -74,19 +74,22 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         final imageStat = await File(imagePath!).stat();
         final imageData = await getImg;
         final imageBrand = AnyFile().fromMap(imageData);
-        imageBrand.path = compressed?.path;
         imageBrand.type = imageStat.type.toString();
         imageBrand.size = imageStat.size;
         imageBrand.brandId = brandId;
         if (widget.iniData == null) {
+          imageBrand.path = compressed?.path;
           await txn.insert("AnyFile", imageBrand.toMap);
         } else {
+          _imageHelper.delete(imageBrand.path!);
+          imageBrand.path = compressed?.path;
           await txn.update("AnyFile", imageBrand.toMap,
               where: "id = ?", whereArgs: [imageBrand.id]);
         }
       }
     }).then((_) => showDialog(
         context: context,
+        useRootNavigator: false,
         builder: (context) => Dialog(
                 child: SizedBox(
               width: 200,
