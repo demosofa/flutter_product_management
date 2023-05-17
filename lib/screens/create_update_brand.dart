@@ -156,35 +156,34 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
               )
           ],
         ),
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: CustomScrollView(
           slivers: <Widget>[
+            SliverToBoxAdapter(
+              child: Center(
+                  child: InkWell(
+                onTap: pickImage,
+                child: FittedBox(
+                    child: FutureBuilder(
+                        future: getImg,
+                        builder: (context, snapshot) {
+                          return CircleAvatar(
+                            radius: 60,
+                            foregroundImage: loadImage(snapshot.data),
+                            child: Text(iconTitle.substring(0, 2).toUpperCase(),
+                                style: const TextStyle(fontSize: 48)),
+                          );
+                        })),
+              )),
+            ),
             SliverPadding(
-              padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
+              padding: const EdgeInsets.only(
+                  top: 20, left: 25, right: 25, bottom: 20),
               sliver: SliverFillRemaining(
                 child: Form(
                     key: _formKey,
                     child: ListView(
                       children: <Widget>[
-                        Center(
-                            child: InkWell(
-                          onTap: pickImage,
-                          child: FittedBox(
-                              child: FutureBuilder(
-                                  future: getImg,
-                                  builder: (context, snapshot) {
-                                    return CircleAvatar(
-                                      radius: 60,
-                                      foregroundImage: loadImage(snapshot.data),
-                                      child: Text(
-                                          iconTitle
-                                              .substring(0, 2)
-                                              .toUpperCase(),
-                                          style: const TextStyle(fontSize: 48)),
-                                    );
-                                  })),
-                        )),
-                        const SizedBox(height: 30),
                         TextFormField(
                           decoration: const InputDecoration(
                               labelText: "Tên thương hiệu",
@@ -192,7 +191,9 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Icon(Icons.person),
                               ),
-                              border: OutlineInputBorder()),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)))),
                           keyboardType: TextInputType.name,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(25)
@@ -215,7 +216,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         TextFormField(
                           decoration: const InputDecoration(
                               labelText: "Địa chỉ nhập hàng",
@@ -223,7 +224,9 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Icon(Icons.streetview),
                               ),
-                              border: OutlineInputBorder()),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)))),
                           keyboardType: TextInputType.streetAddress,
                           inputFormatters: [
                             LengthLimitingTextInputFormatter(100)
@@ -239,7 +242,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         TextFormField(
                           decoration: const InputDecoration(
                               labelText: "Số điện thoại",
@@ -247,7 +250,9 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Icon(Icons.phone),
                               ),
-                              border: OutlineInputBorder()),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)))),
                           keyboardType: TextInputType.phone,
                           inputFormatters: [
                             MaskTextInputFormatter(
@@ -266,7 +271,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             return null;
                           },
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         TextFormField(
                           decoration: const InputDecoration(
                               labelText: "Chú ý",
@@ -274,7 +279,9 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 child: Icon(Icons.note),
                               ),
-                              border: OutlineInputBorder()),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8)))),
                           maxLines: null,
                           keyboardType: TextInputType.multiline,
                           inputFormatters: [
@@ -285,7 +292,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                             brand.note = newValue;
                           },
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 30),
                         ElevatedButton(
                             onPressed: create, child: const Text("Submit"))
                       ],

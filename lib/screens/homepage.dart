@@ -142,56 +142,48 @@ class _HomePageState extends State<HomePage> {
                   builder: (context, snapshot) {
                     if (snapshot.data == null) return const Text("Loading");
                     return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 15),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Column(
-                            children: <Widget>[
-                              DataTable(
-                                  sortColumnIndex: sortIdx,
-                                  sortAscending: isAscending,
-                                  columns: <DataColumn>[
-                                    const DataColumn(label: Text("No.")),
-                                    for (var i = 0;
-                                        i < productColumns.length;
-                                        i++)
-                                      DataColumn(
-                                        label: Text(productColumns[i]),
-                                        onSort: (columnIndex, ascending) {
-                                          setState(() {
-                                            sortIdx = columnIndex;
-                                            isAscending = ascending;
-                                          });
-                                        },
-                                      )
-                                  ],
-                                  rows: snapshot.data!.asMap().entries.map(
-                                    (e) {
-                                      int key = e.key;
-                                      var value = e.value;
-                                      Product product =
-                                          Product().fromMap(value);
-                                      return DataRow(
-                                        cells: <DataCell>[
-                                          DataCell(Text((key + 1).toString())),
-                                          ...productColumns.map((col) =>
-                                              DataCell(Text(
-                                                  product.get(col).toString())))
-                                        ],
-                                        onLongPress: () {
-                                          Navigator.of(context)
-                                              .pushNamed(
-                                                  "/create_update_product",
-                                                  arguments: product)
-                                              .then((value) => setState(() {}));
-                                        },
-                                      );
-                                    },
-                                  ).toList()),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 15),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                            sortColumnIndex: sortIdx,
+                            sortAscending: isAscending,
+                            columns: <DataColumn>[
+                              const DataColumn(label: Text("No.")),
+                              for (var i = 0; i < productColumns.length; i++)
+                                DataColumn(
+                                  label: Text(productColumns[i]),
+                                  onSort: (columnIndex, ascending) {
+                                    setState(() {
+                                      sortIdx = columnIndex;
+                                      isAscending = ascending;
+                                    });
+                                  },
+                                )
                             ],
-                          ),
-                        ));
+                            rows: snapshot.data!.asMap().entries.map(
+                              (e) {
+                                int key = e.key;
+                                var value = e.value;
+                                Product product = Product().fromMap(value);
+                                return DataRow(
+                                  cells: <DataCell>[
+                                    DataCell(Text((key + 1).toString())),
+                                    ...productColumns.map((col) => DataCell(
+                                        Text(product.get(col).toString())))
+                                  ],
+                                  onLongPress: () {
+                                    Navigator.of(context)
+                                        .pushNamed("/create_update_product",
+                                            arguments: product)
+                                        .then((value) => setState(() {}));
+                                  },
+                                );
+                              },
+                            ).toList()),
+                      ),
+                    );
                   })
             ],
           ),

@@ -117,7 +117,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
             key: _formKey,
             child: Wrap(
                 alignment: WrapAlignment.center,
-                runSpacing: 10,
+                runSpacing: 20,
                 children: <Widget>[
                   FutureBuilder(
                     future: fetchBrand(),
@@ -186,7 +186,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.person),
                         ),
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
                     keyboardType: TextInputType.name,
                     inputFormatters: [LengthLimitingTextInputFormatter(25)],
                     initialValue: product.name,
@@ -208,7 +210,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.currency_exchange),
                         ),
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -236,7 +240,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.price_change),
                         ),
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -263,7 +269,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.currency_exchange),
                         ),
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -288,7 +296,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                           padding: EdgeInsets.symmetric(vertical: 10),
                           child: Icon(Icons.note),
                         ),
-                        border: OutlineInputBorder()),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
                     maxLines: null,
                     keyboardType: TextInputType.multiline,
                     inputFormatters: [LengthLimitingTextInputFormatter(200)],
@@ -297,7 +307,11 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                       product.note = newValue;
                     },
                   ),
-                  ElevatedButton(onPressed: create, child: const Text("Submit"))
+                  SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                          onPressed: create, child: const Text("Submit")))
                 ])),
       ),
     );
