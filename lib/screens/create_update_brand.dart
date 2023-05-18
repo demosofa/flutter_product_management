@@ -161,28 +161,29 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
           slivers: <Widget>[
             SliverToBoxAdapter(
               child: Center(
-                  child: InkWell(
-                onTap: pickImage,
-                child: FittedBox(
-                    child: FutureBuilder(
-                        future: getImg,
-                        builder: (context, snapshot) {
-                          return CircleAvatar(
-                            radius: 60,
-                            foregroundImage: loadImage(snapshot.data),
-                            child: Text(iconTitle.substring(0, 2).toUpperCase(),
-                                style: const TextStyle(fontSize: 48)),
-                          );
-                        })),
-              )),
+                  child: Padding(padding: const EdgeInsets.only(top: 20), child: InkWell(
+                    onTap: pickImage,
+                    child: FittedBox(
+                        child: FutureBuilder(
+                            future: getImg,
+                            builder: (context, snapshot) {
+                              return CircleAvatar(
+                                radius: 60,
+                                foregroundImage: loadImage(snapshot.data),
+                                child: Text(iconTitle.substring(0, 2).toUpperCase(),
+                                    style: const TextStyle(fontSize: 48)),
+                              );
+                            })),
+                  )),)
             ),
             SliverPadding(
               padding: const EdgeInsets.only(
-                  top: 20, left: 25, right: 25, bottom: 20),
+                  top: 20, left: 25, right: 25),
               sliver: SliverFillRemaining(
+                hasScrollBody: false,
                 child: Form(
                     key: _formKey,
-                    child: ListView(
+                    child: Column(
                       children: <Widget>[
                         TextFormField(
                           decoration: const InputDecoration(
