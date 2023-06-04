@@ -1,6 +1,6 @@
-import 'package:product_manager/utils/model_util.dart';
+import 'package:product_manager/abstract/model.abstract.dart';
 
-class AnyFile extends ModelUtil<AnyFile> {
+class AnyFile extends AModel<AnyFile> {
   int? id;
   String? path;
   String? type;

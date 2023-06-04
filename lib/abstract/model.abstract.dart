@@ -1,4 +1,4 @@
-abstract class ModelUtil<T> {
+abstract class AModel<T> {
   List<String> get props;
   Map<String, Object?> get toMap;
   T fromMap(Map<String, Object?>? map);

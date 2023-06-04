@@ -1,6 +1,6 @@
-import 'package:product_manager/utils/model_util.dart';
+import 'package:product_manager/abstract/model.abstract.dart';
 
-class User extends ModelUtil<User> {
+class User extends AModel<User> {
   int? id;
   String? name;
   String? phone;
