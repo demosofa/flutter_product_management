@@ -90,7 +90,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     }).then((_) => showDialog(
         context: context,
         useRootNavigator: false,
-        builder: (context) => Dialog(
+        builder: (dialogContext) => Dialog(
                 child: SizedBox(
               width: 200,
               height: 150,
@@ -106,7 +106,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                         children: <Widget>[
                           TextButton(
                               onPressed: (() {
-                                Navigator.pop(context);
+                                Navigator.pop(dialogContext);
                               }),
                               child: const Text("Ok"))
                         ],
@@ -160,8 +160,10 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         body: CustomScrollView(
           slivers: <Widget>[
             SliverToBoxAdapter(
-              child: Center(
-                  child: Padding(padding: const EdgeInsets.only(top: 20), child: InkWell(
+                child: Center(
+              child: Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: InkWell(
                     onTap: pickImage,
                     child: FittedBox(
                         child: FutureBuilder(
@@ -170,17 +172,16 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                               return CircleAvatar(
                                 radius: 60,
                                 foregroundImage: loadImage(snapshot.data),
-                                child: Text(iconTitle.substring(0, 2).toUpperCase(),
+                                child: Text(
+                                    iconTitle.substring(0, 2).toUpperCase(),
                                     style: const TextStyle(fontSize: 48)),
                               );
                             })),
-                  )),)
-            ),
+                  )),
+            )),
             SliverPadding(
-              padding: const EdgeInsets.only(
-                  top: 20, left: 25, right: 25),
+              padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
               sliver: SliverFillRemaining(
-                hasScrollBody: false,
                 child: Form(
                     key: _formKey,
                     child: Column(

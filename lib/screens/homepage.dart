@@ -123,7 +123,7 @@ class _HomePageState extends State<HomePage> {
                                     },
                                     child: Text(brand.name!)),
                               );
-                            }).toList()
+                            })
                           ],
                           value: dropdownBrand,
                           onChanged: (value) {

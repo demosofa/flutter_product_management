@@ -2,7 +2,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-class SQLiteHelper {
+final class SQLiteHelper {
   static const String _tableUser = '''CREATE TABLE IF NOT EXISTS User (
     id INTEGER PRIMARY KEY, 
     name TEXT NOT NULL, 
