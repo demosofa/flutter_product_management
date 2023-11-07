@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/brand.dart';
 import 'package:product_manager/models/product.dart';
-import 'package:string_validator/string_validator.dart';
 
 class CreateUpdateProduct extends StatefulWidget {
   const CreateUpdateProduct({super.key, this.iniData});
@@ -250,6 +249,8 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                         border: OutlineInputBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(8)))),
+                    //If the keyboardType is already number, we don't need to
+                    //check whether the input is numeric or not
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
@@ -257,11 +258,13 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                     onSaved: (value) {
                       product.cost = int.parse(value!);
                     },
+                    //Must include onChange when validating the form input
+                    onChanged: (value) {
+                      _formKey.currentState!.validate();
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Xin hãy điền chi phí";
-                      } else if (!isNumeric(value) || int.parse(value) < 0) {
-                        return "Xin hãy điền giá trị là số";
                       } else if (int.parse(value) >
                           int.parse(_priceController.value.text)) {
                         return "Xin hãy điền giá trị bé hơn giá trị giá cả";
@@ -281,18 +284,20 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                         border: OutlineInputBorder(
                             borderRadius:
                                 BorderRadius.all(Radius.circular(8)))),
+                    //The same as above
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
                     ],
+                    onChanged: (value) {
+                      _formKey.currentState!.validate();
+                    },
                     onSaved: (value) {
                       product.price = int.parse(value!);
                     },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Xin hãy điền giá cả";
-                      } else if (!isNumeric(value) || int.parse(value) < 0) {
-                        return "Xin hãy điền giá trị là số";
                       } else if (int.parse(value) <
                           int.parse(_costController.value.text)) {
                         return "Xin hãy điền giá trị lớn hơn giá trị chi phí";
@@ -319,11 +324,12 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                     onSaved: (value) {
                       product.init = int.parse(value!);
                     },
+                    onChanged: (value) {
+                      _formKey.currentState!.validate();
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return "Xin hãy điền số lượng nhập hàng";
-                      } else if (!isNumeric(value) || int.parse(value) < 0) {
-                        return "Xin hãy điền giá trị là số tự nhiên";
                       }
                       return null;
                     },
