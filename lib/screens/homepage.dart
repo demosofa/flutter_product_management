@@ -9,7 +9,8 @@ class HomePage extends StatefulWidget {
   final String? title;
   final List<NavigationDestination> routes = [
     const NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-    const NavigationDestination(icon: Icon(Icons.history), label: 'History')
+    const NavigationDestination(
+        icon: Icon(Icons.branding_watermark), label: 'Brands')
   ];
 
   @override
@@ -20,7 +21,7 @@ class _HomePageState extends State<HomePage> {
   int currentPageIdx = 0;
   String title = "Demo";
   String dropdownBrand = "All";
-  List<String> productColumns = Product().props.sublist(1);
+  List<String> productColumns = Product.props.sublist(1);
   int sortIdx = 1;
   bool isAscending = false;
 
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   Future<List<Map<String, Object?>>> fetchProduct() async {
     List<Map<String, Object?>> lstProduct = [];
     String orderQuery =
-        "${Product().props[sortIdx]} ${isAscending ? "ASC" : "DESC"}";
+        "${Product.props[sortIdx]} ${isAscending ? "ASC" : "DESC"}";
     final db = await SQLiteHelper.db;
     if (db.isOpen) {
       await db.transaction((txn) async {
@@ -109,7 +110,7 @@ class _HomePageState extends State<HomePage> {
                               child: GestureDetector(child: const Text("All")),
                             ),
                             ...snapshot.data!.map((e) {
-                              Brand brand = Brand().fromMap(e);
+                              Brand brand = Brand.fromMap(e);
                               return DropdownMenuItem<String>(
                                 value: brand.id.toString(),
                                 child: GestureDetector(
@@ -166,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                               (e) {
                                 int key = e.key;
                                 var value = e.value;
-                                Product product = Product().fromMap(value);
+                                Product product = Product.fromMap(value);
                                 return DataRow(
                                   cells: <DataCell>[
                                     DataCell(Text((key + 1).toString())),
@@ -187,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                   })
             ],
           ),
-        )
+        ),
       ][currentPageIdx],
       floatingActionButton: FloatingActionButton(
         onPressed: () {

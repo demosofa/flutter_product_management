@@ -73,7 +73,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         final compressed = await _imageHelper.compress(imagePath!, path);
         final imageStat = await File(imagePath!).stat();
         final imageData = await getImg;
-        final imageBrand = AnyFile().fromMap(imageData);
+        final imageBrand = AnyFile.fromMap(imageData);
         imageBrand.type = imageStat.type.toString();
         imageBrand.size = imageStat.size;
         imageBrand.brandId = brandId;
@@ -182,6 +182,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
             SliverPadding(
               padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
               sliver: SliverFillRemaining(
+                hasScrollBody: false,
                 child: Form(
                     key: _formKey,
                     child: Column(

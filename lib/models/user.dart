@@ -11,8 +11,11 @@ class User extends AModel<User> {
   User.nec(this.name, this.phone, this.address, this.note);
   User.full(this.id, this.name, this.phone, this.address, this.note);
 
-  @override
-  List<String> get props => ["id", "name", "phone", "address", "note"];
+  factory User.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return User();
+    return User.full(
+        map['id'], map['name'], map['phone'], map['address'], map['note']);
+  }
 
   @override
   Map<String, Object?> get toMap => ({
@@ -23,10 +26,5 @@ class User extends AModel<User> {
         "note": note,
       });
 
-  @override
-  User fromMap(Map<String, dynamic>? map) {
-    if (map == null) return User();
-    return User.full(
-        map['id'], map['name'], map['phone'], map['address'], map['note']);
-  }
+  static List<String> get props => ["id", "name", "phone", "address", "note"];
 }

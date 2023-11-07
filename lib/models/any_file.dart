@@ -14,9 +14,12 @@ class AnyFile extends AModel<AnyFile> {
       this.productId);
   AnyFile.full(this.id, this.path, this.type, this.size, this.userId,
       this.brandId, this.productId);
-  @override
-  List<String> get props =>
-      ["id", "path", "type", "size", "userId", "brandId", "productId"];
+
+  factory AnyFile.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return AnyFile();
+    return AnyFile.full(map['id'], map['path'], map['type'], map['size'],
+        map['userId'], map['brandId'], map['productId']);
+  }
 
   @override
   Map<String, Object?> get toMap => ({
@@ -29,10 +32,6 @@ class AnyFile extends AModel<AnyFile> {
         "productId": productId
       });
 
-  @override
-  AnyFile fromMap(Map<String, dynamic>? map) {
-    if (map == null) return AnyFile();
-    return AnyFile.full(map['id'], map['path'], map['type'], map['size'],
-        map['userId'], map['brandId'], map['productId']);
-  }
+  static List<String> get props =>
+      ["id", "path", "type", "size", "userId", "brandId", "productId"];
 }

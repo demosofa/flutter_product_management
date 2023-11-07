@@ -16,9 +16,11 @@ class Product extends AModel<Product> {
   Product.full(this.id, this.name, this.note, this.price, this.cost, this.init,
       this.sold, this.brandId);
 
-  @override
-  List<String> get props =>
-      ["id", "name", "note", "price", "cost", "init", "sold", "brandId"];
+  factory Product.fromMap(Map<String, dynamic>? map) {
+    if (map == null) return Product();
+    return Product.full(map['id'], map['name'], map['note'], map['price'],
+        map['cost'], map['init'], map['sold'], map['brandId']);
+  }
 
   @override
   Map<String, Object?> get toMap => ({
@@ -32,10 +34,6 @@ class Product extends AModel<Product> {
         "brandId": brandId
       });
 
-  @override
-  Product fromMap(Map<String, dynamic>? map) {
-    if (map == null) return Product();
-    return Product.full(map['id'], map['name'], map['note'], map['price'],
-        map['cost'], map['init'], map['sold'], map['brandId']);
-  }
+  static List<String> get props =>
+      ["id", "name", "note", "price", "cost", "init", "sold", "brandId"];
 }

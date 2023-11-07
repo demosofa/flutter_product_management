@@ -125,250 +125,235 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
         padding: const EdgeInsets.only(top: 20, left: 25, right: 25),
         child: Form(
             key: _formKey,
-            child: LayoutBuilder(
-                builder: (context, constraints) => Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          FutureBuilder(
-                            future: fetchBrand(),
-                            builder: (context, snapshot) {
-                              if (snapshot.data == null) {
-                                return const Text('Loading');
-                              } else if (snapshot.data != null &&
-                                  snapshot.data!.isEmpty) {
-                                return const SizedBox.shrink();
-                              } else {
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 5.0),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: DropdownButtonFormField<String>(
-                                          hint: const Text("Brand"),
-                                          items: snapshot.data!.map((e) {
-                                            Brand brand = Brand().fromMap(e);
-                                            return DropdownMenuItem<String>(
-                                              value: brand.id.toString(),
-                                              child: GestureDetector(
-                                                  onLongPress: () {
-                                                    Navigator.of(context)
-                                                        .pushNamed(
-                                                            "/create_update_brand",
-                                                            arguments: brand)
-                                                        .then((value) {
-                                                      Navigator.pop(context);
-                                                      setState(() {});
-                                                    });
-                                                  },
-                                                  child: Text(
-                                                      brand.name.toString())),
-                                            );
-                                          }).toList(),
-                                          value: dropdownBrand.isNotEmpty
-                                              ? dropdownBrand
-                                              : snapshot.data!.first["id"]
-                                                  .toString(),
-                                          onChanged: (value) {
-                                            setState(() {
-                                              dropdownBrand = value.toString();
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  FutureBuilder(
+                    future: fetchBrand(),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == null) {
+                        return const Text('Loading');
+                      } else if (snapshot.data != null &&
+                          snapshot.data!.isEmpty) {
+                        return const SizedBox.shrink();
+                      } else {
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 5.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  hint: const Text("Brand"),
+                                  items: snapshot.data!.map((e) {
+                                    Brand brand = Brand.fromMap(e);
+                                    return DropdownMenuItem<String>(
+                                      value: brand.id.toString(),
+                                      child: GestureDetector(
+                                          onLongPress: () {
+                                            Navigator.of(context)
+                                                .pushNamed(
+                                                    "/create_update_brand",
+                                                    arguments: brand)
+                                                .then((value) {
+                                              Navigator.pop(context);
+                                              setState(() {});
                                             });
                                           },
-                                          onSaved: (newValue) {
-                                            product.brandId =
-                                                int.parse(newValue!);
-                                          },
-                                        ),
-                                      ),
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pushNamed(context,
-                                                    "/create_update_brand")
-                                                .then(
-                                                    (value) => setState(() {}));
-                                          },
-                                          child:
-                                              const Text("Tạo thương hiệu mới"))
-                                    ],
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          FutureBuilder(
-                            future: fetchImages(),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return const SizedBox.shrink();
-                              }
-                              return SizedBox(
-                                  height: constraints.maxHeight * .6,
-                                  child: GridView.builder(
-                                    itemCount: snapshot.data!.length,
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 4,
-                                            mainAxisSpacing: 10,
-                                            crossAxisSpacing: 10),
-                                    itemBuilder: (context, index) {
-                                      return Container(
-                                        decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: FileImage(File(snapshot
-                                                    .data![index]["path"])))),
-                                      );
-                                    },
-                                  ));
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                                labelText: "Tên sản phẩm",
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Icon(Icons.person),
+                                          child: Text(brand.name.toString())),
+                                    );
+                                  }).toList(),
+                                  value: dropdownBrand.isNotEmpty
+                                      ? dropdownBrand
+                                      : snapshot.data!.first["id"].toString(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      dropdownBrand = value.toString();
+                                    });
+                                  },
+                                  onSaved: (newValue) {
+                                    product.brandId = int.parse(newValue!);
+                                  },
                                 ),
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)))),
-                            keyboardType: TextInputType.name,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(25)
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pushNamed(
+                                            context, "/create_update_brand")
+                                        .then((value) => setState(() {}));
+                                  },
+                                  child: const Text("Tạo thương hiệu mới"))
                             ],
-                            initialValue: product.name,
-                            onSaved: (value) {
-                              product.name = value;
-                            },
-                            validator: (value) {
-                              if (value?.isEmpty == true) {
-                                return "Xin hãy điền tên sản phẩm";
-                              }
-                              return null;
-                            },
                           ),
-                          const SizedBox(height: 15),
-                          TextFormField(
-                            controller: _costController,
-                            decoration: const InputDecoration(
-                                labelText: "Chi phí",
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Icon(Icons.currency_exchange),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)))),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onSaved: (value) {
-                              product.cost = int.parse(value!);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Xin hãy điền chi phí";
-                              } else if (!isNumeric(value) ||
-                                  int.parse(value) < 0) {
-                                return "Xin hãy điền giá trị là số";
-                              } else if (int.parse(value) >
-                                  int.parse(_priceController.value.text)) {
-                                return "Xin hãy điền giá trị bé hơn giá trị giá cả";
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          TextFormField(
-                            controller: _priceController,
-                            decoration: const InputDecoration(
-                                labelText: "Giá cả",
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Icon(Icons.price_change),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)))),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onSaved: (value) {
-                              product.price = int.parse(value!);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Xin hãy điền giá cả";
-                              } else if (!isNumeric(value) ||
-                                  int.parse(value) < 0) {
-                                return "Xin hãy điền giá trị là số";
-                              } else if (int.parse(value) <
-                                  int.parse(_costController.value.text)) {
-                                return "Xin hãy điền giá trị lớn hơn giá trị chi phí";
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                                labelText: "Số lượng nhập hàng",
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Icon(Icons.currency_exchange),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)))),
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            initialValue: product.init.toString(),
-                            onSaved: (value) {
-                              product.init = int.parse(value!);
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return "Xin hãy điền số lượng nhập hàng";
-                              } else if (!isNumeric(value) ||
-                                  int.parse(value) < 0) {
-                                return "Xin hãy điền giá trị là số tự nhiên";
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 15),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                                labelText: "Chú ý",
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 10),
-                                  child: Icon(Icons.note),
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8)))),
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(200)
-                            ],
-                            initialValue: product.note,
-                            onSaved: (newValue) {
-                              product.note = newValue;
-                            },
-                          ),
-                          const SizedBox(height: 20),
-                          SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                  onPressed: create,
-                                  child: const Text("Submit")))
-                        ]))),
+                        );
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  FutureBuilder(
+                    future: fetchImages(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const SizedBox.shrink();
+                      }
+                      return GridView.builder(
+                        itemCount: snapshot.data!.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 3,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10),
+                        itemBuilder: (context, index) {
+                          return Container(
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    fit: BoxFit.contain,
+                                    image: FileImage(
+                                        File(snapshot.data![index]["path"])))),
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Tên sản phẩm",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.person),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    keyboardType: TextInputType.name,
+                    inputFormatters: [LengthLimitingTextInputFormatter(25)],
+                    initialValue: product.name,
+                    onSaved: (value) {
+                      product.name = value;
+                    },
+                    validator: (value) {
+                      if (value?.isEmpty == true) {
+                        return "Xin hãy điền tên sản phẩm";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    controller: _costController,
+                    decoration: const InputDecoration(
+                        labelText: "Chi phí",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.currency_exchange),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    onSaved: (value) {
+                      product.cost = int.parse(value!);
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Xin hãy điền chi phí";
+                      } else if (!isNumeric(value) || int.parse(value) < 0) {
+                        return "Xin hãy điền giá trị là số";
+                      } else if (int.parse(value) >
+                          int.parse(_priceController.value.text)) {
+                        return "Xin hãy điền giá trị bé hơn giá trị giá cả";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    controller: _priceController,
+                    decoration: const InputDecoration(
+                        labelText: "Giá cả",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.price_change),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    onSaved: (value) {
+                      product.price = int.parse(value!);
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Xin hãy điền giá cả";
+                      } else if (!isNumeric(value) || int.parse(value) < 0) {
+                        return "Xin hãy điền giá trị là số";
+                      } else if (int.parse(value) <
+                          int.parse(_costController.value.text)) {
+                        return "Xin hãy điền giá trị lớn hơn giá trị chi phí";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Số lượng nhập hàng",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.currency_exchange),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    initialValue: product.init.toString(),
+                    onSaved: (value) {
+                      product.init = int.parse(value!);
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Xin hãy điền số lượng nhập hàng";
+                      } else if (!isNumeric(value) || int.parse(value) < 0) {
+                        return "Xin hãy điền giá trị là số tự nhiên";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                        labelText: "Chú ý",
+                        prefixIcon: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                          child: Icon(Icons.note),
+                        ),
+                        border: OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(8)))),
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    inputFormatters: [LengthLimitingTextInputFormatter(200)],
+                    initialValue: product.note,
+                    onSaved: (newValue) {
+                      product.note = newValue;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                          onPressed: create, child: const Text("Submit")))
+                ])),
       ),
     );
   }
