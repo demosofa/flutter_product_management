@@ -1,4 +1,4 @@
-# Product Manager
+# Product Management App
 
 ## Introduction
 
