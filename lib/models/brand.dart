@@ -8,7 +8,9 @@ class Brand extends AModel<Brand> {
   String? note;
 
   Brand();
+
   Brand.nec(this.name, this.phone, this.address, this.note);
+
   Brand.full(this.id, this.name, this.phone, this.address, this.note);
 
   factory Brand.fromMap(Map<String, dynamic>? map) {
@@ -18,7 +20,7 @@ class Brand extends AModel<Brand> {
   }
 
   @override
-  Map<String, Object?> get toMap => ({
+  Map<String, Object?> toMap() => ({
         "id": id,
         "name": name,
         "phone": phone,

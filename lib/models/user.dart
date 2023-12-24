@@ -8,7 +8,9 @@ class User extends AModel<User> {
   String? note;
 
   User();
+
   User.nec(this.name, this.phone, this.address, this.note);
+
   User.full(this.id, this.name, this.phone, this.address, this.note);
 
   factory User.fromMap(Map<String, dynamic>? map) {
@@ -18,7 +20,7 @@ class User extends AModel<User> {
   }
 
   @override
-  Map<String, Object?> get toMap => ({
+  Map<String, Object?> toMap() => ({
         "id": id,
         "name": name,
         "phone": phone,

@@ -1,9 +1,11 @@
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:product_manager/enums/table_name.dart';
 import 'package:sqflite/sqflite.dart';
 
 final class SQLiteHelper {
-  static const String _tableUser = '''CREATE TABLE IF NOT EXISTS User (
+  static final String _tableUser =
+      '''CREATE TABLE IF NOT EXISTS ${TableName.user.name} (
     id INTEGER PRIMARY KEY, 
     name TEXT NOT NULL, 
     phone TEXT NOT NULL, 
@@ -13,7 +15,8 @@ final class SQLiteHelper {
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
   )''';
 
-  static const dynamic _tableBrand = '''CREATE TABLE IF NOT EXISTS Brand (
+  static final dynamic _tableBrand =
+      '''CREATE TABLE IF NOT EXISTS ${TableName.brand.name} (
     id INTEGER PRIMARY KEY, 
     name TEXT NOT NULL, 
     phone TEXT NOT NULL, 
@@ -23,7 +26,8 @@ final class SQLiteHelper {
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
   )''';
 
-  static const _tableProduct = '''CREATE TABLE IF NOT EXISTS Product (
+  static final _tableProduct =
+      '''CREATE TABLE IF NOT EXISTS ${TableName.product.name} (
     id INTEGER PRIMARY KEY, 
     name TEXT NOT NULL, 
     note TEXT, 
@@ -34,10 +38,11 @@ final class SQLiteHelper {
     createdAt DATETIME DEFAULT CURRENT_TIMESTAMP, 
     updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP, 
     brandId INTEGER NOT NULL, 
-    FOREIGN KEY (brandId) REFERENCES Brand (id)
+    FOREIGN KEY (brandId) REFERENCES ${TableName.brand.name} (id)
   )''';
 
-  static const String _tableFile = '''CREATE TABLE IF NOT EXISTS AnyFile (
+  static final String _tableFile =
+      '''CREATE TABLE IF NOT EXISTS ${TableName.anyFile.name} (
     id INTEGER PRIMARY KEY,
     path TEXT NOT NULL, 
     type TEXT NOT NULL, 
@@ -47,9 +52,9 @@ final class SQLiteHelper {
     userId INTEGER UNIQUE,
     brandId INTEGER UNIQUE,
     productId INTEGER,
-    FOREIGN KEY (userId) REFERENCES User (id),
-    FOREIGN KEY (brandId) REFERENCES Brand (id),
-    FOREIGN KEY (productId) REFERENCES Product (id)
+    FOREIGN KEY (userId) REFERENCES ${TableName.user.name} (id),
+    FOREIGN KEY (brandId) REFERENCES ${TableName.brand.name} (id),
+    FOREIGN KEY (productId) REFERENCES ${TableName.product.name} (id)
   )''';
 
   static String _triggerTimestamp(String table) => '''
@@ -68,13 +73,14 @@ final class SQLiteHelper {
   }
 
   static Future<void> _createTrigger(Database db) async {
-    await db.execute(_triggerTimestamp("User"));
-    await db.execute(_triggerTimestamp("AnyFile"));
-    await db.execute(_triggerTimestamp("Brand"));
-    await db.execute(_triggerTimestamp("Product"));
+    await db.execute(_triggerTimestamp(TableName.user.name));
+    await db.execute(_triggerTimestamp(TableName.brand.name));
+    await db.execute(_triggerTimestamp(TableName.product.name));
+    await db.execute(_triggerTimestamp(TableName.anyFile.name));
   }
 
   static Database? _db;
+
   static Future<Database> get db async => _db ??= await openDatabase(
         join((await getApplicationDocumentsDirectory()).path, "gas_db"),
         version: 1,

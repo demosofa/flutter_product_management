@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:product_manager/models/brand.dart';
 import 'package:product_manager/models/product.dart';
+import 'package:product_manager/notifiers/history/history_notifier.dart';
+import 'package:product_manager/notifiers/history/inherited_history.dart';
 import 'package:product_manager/screens/create_update_brand.dart';
 import 'package:product_manager/screens/create_update_product.dart';
 import 'package:product_manager/widgets/binding/my_image_cache.dart';
@@ -10,11 +12,13 @@ import 'screens/homepage.dart';
 
 void main() {
   MyImageCache();
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+
+  final _historyNotifier = HistoryNotifier();
 
   Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     final List<String> pathElements = settings.name!.split("/");
@@ -40,15 +44,18 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-          primarySwatch: Colors.blue,
-          pageTransitionsTheme: const PageTransitionsTheme(builders: {
-            TargetPlatform.android: ZoomPageTransitionsBuilder()
-          })),
-      onGenerateRoute: onGenerateRoute,
-      home: HomePage(),
+    return InheritedHistory(
+      historyNotifier: _historyNotifier,
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+            primarySwatch: Colors.blue,
+            pageTransitionsTheme: const PageTransitionsTheme(builders: {
+              TargetPlatform.android: ZoomPageTransitionsBuilder()
+            })),
+        onGenerateRoute: onGenerateRoute,
+        home: HomePage(),
+      ),
     );
   }
 }

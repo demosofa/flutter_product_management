@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:product_manager/enums/table_name.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/brand.dart';
 import 'package:product_manager/models/product.dart';
 import 'package:product_manager/screens/create_update_product.dart';
+import 'package:product_manager/screens/history.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({super.key, this.title});
+
   final String? title;
-  final List<NavigationDestination> routes = [
+  final List<NavigationDestination> destinations = [
     const NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-    const NavigationDestination(
-        icon: Icon(Icons.branding_watermark), label: 'Brands')
+    // const NavigationDestination(
+    //     icon: Icon(Icons.branding_watermark), label: 'Brands'),
+    const NavigationDestination(icon: Icon(Icons.history), label: 'History')
   ];
 
   @override
@@ -32,7 +36,7 @@ class _HomePageState extends State<HomePage> {
       if (widget.title != null) {
         title = widget.title!;
       } else {
-        title = widget.routes[currentPageIdx].label;
+        title = widget.destinations[currentPageIdx].label;
       }
     });
     imageCache.clear();
@@ -43,7 +47,7 @@ class _HomePageState extends State<HomePage> {
     final db = await SQLiteHelper.db;
     if (db.isOpen) {
       await db.transaction((txn) async {
-        lstBrand = await txn.query("Brand");
+        lstBrand = await txn.query(TableName.brand.name);
       });
     }
     return lstBrand;
@@ -57,9 +61,10 @@ class _HomePageState extends State<HomePage> {
     if (db.isOpen) {
       await db.transaction((txn) async {
         if (dropdownBrand == "All") {
-          lstProduct = await txn.query("Product", orderBy: orderQuery);
+          lstProduct =
+              await txn.query(TableName.product.name, orderBy: orderQuery);
         } else {
-          lstProduct = await txn.query("Product",
+          lstProduct = await txn.query(TableName.product.name,
               where: "brandId = ?",
               whereArgs: [dropdownBrand],
               orderBy: orderQuery);
@@ -77,12 +82,12 @@ class _HomePageState extends State<HomePage> {
         title: Text(title),
       ),
       bottomNavigationBar: NavigationBar(
-        destinations: widget.routes,
+        destinations: widget.destinations,
         selectedIndex: currentPageIdx,
         onDestinationSelected: (value) {
           setState(() {
             currentPageIdx = value;
-            title = widget.routes[value].label;
+            title = widget.destinations[value].label;
           });
         },
       ),
@@ -93,9 +98,9 @@ class _HomePageState extends State<HomePage> {
               FutureBuilder(
                 future: fetchBrand(),
                 builder: (context, snapshot) {
-                  if (snapshot.data == null) {
+                  if (!snapshot.hasData) {
                     return const Text('Loading');
-                  } else if (snapshot.data != null && snapshot.data!.isEmpty) {
+                  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
                     return const SizedBox.shrink();
                   } else {
                     return Padding(
@@ -141,7 +146,7 @@ class _HomePageState extends State<HomePage> {
               FutureBuilder(
                   future: fetchProduct(),
                   builder: (context, snapshot) {
-                    if (snapshot.data == null) return const Text("Loading");
+                    if (!snapshot.hasData) return const Text("Loading");
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10, horizontal: 15),
@@ -189,6 +194,7 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+        const History()
       ][currentPageIdx],
       floatingActionButton: FloatingActionButton(
         onPressed: () {

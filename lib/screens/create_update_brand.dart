@@ -7,14 +7,20 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:product_manager/enums/history_type.dart';
+import 'package:product_manager/enums/table_name.dart';
 import 'package:product_manager/helpers/sqlite_helper.dart';
 import 'package:product_manager/models/any_file.dart';
+import 'package:product_manager/notifiers/history/history.dart';
+import 'package:product_manager/notifiers/history/history_notifier.dart';
+import 'package:product_manager/notifiers/history/inherited_history.dart';
 
 import '../models/brand.dart';
 import '../helpers/image_helper.dart';
 
 class CreateUpdateBrand extends StatefulWidget {
   final Brand? iniData;
+
   const CreateUpdateBrand({super.key, this.iniData});
 
   @override
@@ -27,9 +33,10 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
   Brand brand = Brand();
   String? imagePath;
   Future<Map<String, dynamic>?>? getImg;
+  final tableBrandName = TableName.brand.name;
   final ImageHelper _imageHelper = ImageHelper();
-
   final _formKey = GlobalKey<FormState>();
+  late HistoryNotifier _historyNotifier;
 
   @override
   void initState() {
@@ -44,12 +51,18 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     }
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _historyNotifier = InheritedHistory.of(context);
+  }
+
   Future<Map<String, dynamic>?> _getImg() async {
     if (widget.iniData == null) {
       return null;
     }
     final db = await SQLiteHelper.db;
-    return db.query("AnyFile",
+    return db.query(TableName.anyFile.name,
         where: "brandId = ?", whereArgs: [brand.id]).then((value) => value[0]);
   }
 
@@ -61,11 +74,21 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     await db.transaction((txn) async {
       int? brandId;
       if (widget.iniData == null) {
-        brandId = await txn.insert("Brand", brand.toMap);
+        brandId = await txn.insert(tableBrandName, brand.toMap());
+        final history = History(
+            type: HistoryType.insert.name,
+            table: tableBrandName,
+            data: brand.toMap());
+        _historyNotifier.add(history);
       } else {
         brandId = brand.id;
-        await txn.update("Brand", brand.toMap,
+        await txn.update(tableBrandName, brand.toMap(),
             where: "id = ?", whereArgs: [brandId]);
+        final history = History(
+            type: HistoryType.update.name,
+            table: tableBrandName,
+            data: brand.toMap());
+        _historyNotifier.add(history);
       }
       if (imagePath != null) {
         String path = (await getApplicationDocumentsDirectory()).path;
@@ -79,11 +102,11 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         imageBrand.brandId = brandId;
         if (widget.iniData == null) {
           imageBrand.path = compressed?.path;
-          await txn.insert("AnyFile", imageBrand.toMap);
+          await txn.insert(TableName.anyFile.name, imageBrand.toMap());
         } else {
           _imageHelper.delete(imageBrand.path!);
           imageBrand.path = compressed?.path;
-          await txn.update("AnyFile", imageBrand.toMap,
+          await txn.update(TableName.anyFile.name, imageBrand.toMap(),
               where: "id = ?", whereArgs: [imageBrand.id]);
         }
       }
@@ -91,28 +114,29 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
         context: context,
         useRootNavigator: false,
         builder: (dialogContext) => Dialog(
-                child: SizedBox(
-              width: 200,
-              height: 150,
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Flex(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    direction: Axis.vertical,
-                    children: <Widget>[
-                      const Text("Thành công thêm Thương hiệu mới"),
-                      Text(jsonEncode(brand.toMap)),
-                      Wrap(
-                        children: <Widget>[
-                          TextButton(
-                              onPressed: (() {
-                                Navigator.pop(dialogContext);
-                              }),
-                              child: const Text("Ok"))
-                        ],
-                      )
-                    ],
-                  )),
+                child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 200),
+              child: SingleChildScrollView(
+                child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Flex(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      direction: Axis.vertical,
+                      children: <Widget>[
+                        const Text("Thành công thêm Thương hiệu mới"),
+                        Text(jsonEncode(brand.toMap())),
+                        Wrap(
+                          children: <Widget>[
+                            TextButton(
+                                onPressed: (() {
+                                  Navigator.pop(dialogContext);
+                                }),
+                                child: const Text("Ok"))
+                          ],
+                        )
+                      ],
+                    )),
+              ),
             ))));
   }
 
@@ -120,8 +144,16 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     final db = await SQLiteHelper.db;
     if (db.isOpen && context.mounted) {
       await db.transaction((txn) async {
-        await txn.delete("Brand", where: "id = ?", whereArgs: [brand.id]);
-      }).then((value) => Navigator.pop(context));
+        await txn
+            .delete(tableBrandName, where: "id = ?", whereArgs: [brand.id]);
+      }).then((value) {
+        final history = History(
+            type: HistoryType.delete.name,
+            table: tableBrandName,
+            data: brand.id);
+        _historyNotifier.add(history);
+        Navigator.pop(context);
+      });
     }
   }
 

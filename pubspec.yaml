@@ -46,6 +46,7 @@ dependencies:
   flutter_image_compress: ^2.0.2
   archive: ^3.3.7
   string_validator: ^1.0.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

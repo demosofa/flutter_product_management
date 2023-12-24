@@ -11,8 +11,10 @@ class Product extends AModel<Product> {
   int? brandId;
 
   Product();
+
   Product.nec(this.name, this.note, this.price, this.cost, this.init, this.sold,
       this.brandId);
+
   Product.full(this.id, this.name, this.note, this.price, this.cost, this.init,
       this.sold, this.brandId);
 
@@ -23,7 +25,7 @@ class Product extends AModel<Product> {
   }
 
   @override
-  Map<String, Object?> get toMap => ({
+  Map<String, Object?> toMap() => ({
         "id": id,
         "name": name,
         "note": note,

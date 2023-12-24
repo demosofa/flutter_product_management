@@ -10,8 +10,10 @@ class AnyFile extends AModel<AnyFile> {
   int? productId;
 
   AnyFile();
+
   AnyFile.nec(this.path, this.type, this.size, this.userId, this.brandId,
       this.productId);
+
   AnyFile.full(this.id, this.path, this.type, this.size, this.userId,
       this.brandId, this.productId);
 
@@ -22,7 +24,7 @@ class AnyFile extends AModel<AnyFile> {
   }
 
   @override
-  Map<String, Object?> get toMap => ({
+  Map<String, Object?> toMap() => ({
         "id": id,
         "path": path,
         "type": type,
