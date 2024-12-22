@@ -19,15 +19,20 @@ class HistoryNotifier extends ChangeNotifier {
     });
   }
 
-  Future<bool> add(History history) {
-    listHistory.add(history);
+  Future<bool> refresh() async {
     final listJson = listHistory.map((e) => e.toJson()).toList();
-    return store.setStringList(key, listJson);
+    final result = await store.setStringList(key, listJson);
+    notifyListeners();
+    return result;
   }
 
-  Future<bool> removeAt(int index) {
+  Future<bool> add(History history) async {
+    listHistory.add(history);
+    return await refresh();
+  }
+
+  Future<bool> removeAt(int index) async {
     listHistory.removeAt(index);
-    final listJson = listHistory.map((e) => e.toJson()).toList();
-    return store.setStringList(key, listJson);
+    return await refresh();
   }
 }

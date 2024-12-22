@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:product_manager/notifiers/history/history_notifier.dart';
 
 class InheritedHistory extends InheritedNotifier<HistoryNotifier> {
@@ -9,7 +9,7 @@ class InheritedHistory extends InheritedNotifier<HistoryNotifier> {
       : super(notifier: historyNotifier);
 
   @override
-  bool updateShouldNotify(InheritedHistory oldHistory) {
+  bool updateShouldNotify(InheritedHistory oldWidget) {
     return true;
   }
 

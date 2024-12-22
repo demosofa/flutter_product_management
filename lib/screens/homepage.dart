@@ -32,12 +32,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    setState(() {
-      if (widget.title != null) {
-        title = widget.title!;
-      } else {
-        title = widget.destinations[currentPageIdx].label;
-      }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        if (widget.title != null) {
+          title = widget.title!;
+        } else {
+          title = widget.destinations[currentPageIdx].label;
+        }
+      });
     });
     imageCache.clear();
   }
@@ -92,107 +94,105 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       body: [
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              FutureBuilder(
-                future: fetchBrand(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return const Text('Loading');
-                  } else if (snapshot.hasData && snapshot.data!.isEmpty) {
-                    return const SizedBox.shrink();
-                  } else {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 15, left: 40),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: DropdownButton<String>(
-                          hint: const Text("Brand"),
-                          items: [
-                            DropdownMenuItem(
-                              value: "All",
-                              child: GestureDetector(child: const Text("All")),
-                            ),
-                            ...snapshot.data!.map((e) {
-                              Brand brand = Brand.fromMap(e);
-                              return DropdownMenuItem<String>(
-                                value: brand.id.toString(),
-                                child: GestureDetector(
-                                    onLongPress: () {
-                                      Navigator.of(context)
-                                          .pushNamed("/create_update_brand",
-                                              arguments: brand)
-                                          .then((value) => setState(
-                                                () {},
-                                              ));
-                                    },
-                                    child: Text(brand.name!)),
-                              );
-                            })
-                          ],
-                          value: dropdownBrand,
-                          onChanged: (value) {
-                            setState(() {
-                              dropdownBrand = value.toString();
-                            });
-                          },
-                        ),
-                      ),
-                    );
-                  }
-                },
-              ),
-              FutureBuilder(
-                  future: fetchProduct(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) return const Text("Loading");
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 15),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                            sortColumnIndex: sortIdx,
-                            sortAscending: isAscending,
-                            columns: <DataColumn>[
-                              const DataColumn(label: Text("No.")),
-                              for (var i = 0; i < productColumns.length; i++)
-                                DataColumn(
-                                  label: Text(productColumns[i]),
-                                  onSort: (columnIndex, ascending) {
-                                    setState(() {
-                                      sortIdx = columnIndex;
-                                      isAscending = ascending;
-                                    });
-                                  },
-                                )
-                            ],
-                            rows: snapshot.data!.asMap().entries.map(
-                              (e) {
-                                int key = e.key;
-                                var value = e.value;
-                                Product product = Product.fromMap(value);
-                                return DataRow(
-                                  cells: <DataCell>[
-                                    DataCell(Text((key + 1).toString())),
-                                    ...productColumns.map((col) => DataCell(
-                                        Text(product.get(col).toString())))
-                                  ],
+        Column(
+          children: [
+            FutureBuilder(
+              future: fetchBrand(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Text('Loading');
+                } else if (snapshot.data!.isEmpty) {
+                  return const SizedBox.shrink();
+                } else {
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 15, left: 40),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: DropdownButton<String>(
+                        hint: const Text("Brand"),
+                        items: [
+                          DropdownMenuItem(
+                            value: "All",
+                            child: GestureDetector(child: const Text("All")),
+                          ),
+                          ...snapshot.data!.map((e) {
+                            Brand brand = Brand.fromMap(e);
+                            return DropdownMenuItem<String>(
+                              value: brand.id.toString(),
+                              child: GestureDetector(
                                   onLongPress: () {
                                     Navigator.of(context)
-                                        .pushNamed("/create_update_product",
-                                            arguments: product)
-                                        .then((value) => setState(() {}));
+                                        .pushNamed("/create_update_brand",
+                                            arguments: brand)
+                                        .then((value) => setState(
+                                              () {},
+                                            ));
                                   },
-                                );
-                              },
-                            ).toList()),
+                                  child: Text(brand.name!)),
+                            );
+                          })
+                        ],
+                        value: dropdownBrand,
+                        onChanged: (value) {
+                          setState(() {
+                            dropdownBrand = value.toString();
+                          });
+                        },
                       ),
-                    );
-                  })
-            ],
-          ),
+                    ),
+                  );
+                }
+              },
+            ),
+            FutureBuilder(
+                future: fetchProduct(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return const Text("Loading");
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10, horizontal: 15),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: DataTable(
+                          sortColumnIndex: sortIdx,
+                          sortAscending: isAscending,
+                          columns: <DataColumn>[
+                            const DataColumn(label: Text("No.")),
+                            for (var i = 0; i < productColumns.length; i++)
+                              DataColumn(
+                                label: Text(productColumns[i]),
+                                onSort: (columnIndex, ascending) {
+                                  setState(() {
+                                    sortIdx = columnIndex;
+                                    isAscending = ascending;
+                                  });
+                                },
+                              )
+                          ],
+                          rows: snapshot.data!.asMap().entries.map(
+                            (e) {
+                              int key = e.key;
+                              var value = e.value;
+                              Product product = Product.fromMap(value);
+                              return DataRow(
+                                cells: <DataCell>[
+                                  DataCell(Text((key + 1).toString())),
+                                  ...productColumns.map((col) => DataCell(
+                                      Text(product.get(col).toString())))
+                                ],
+                                onLongPress: () {
+                                  Navigator.of(context)
+                                      .pushNamed("/create_update_product",
+                                          arguments: product)
+                                      .then((value) => setState(() {}));
+                                },
+                              );
+                            },
+                          ).toList()),
+                    ),
+                  );
+                })
+          ],
         ),
         const History()
       ][currentPageIdx],

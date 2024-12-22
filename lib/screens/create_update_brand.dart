@@ -34,7 +34,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
   String? imagePath;
   Future<Map<String, dynamic>?>? getImg;
   final tableBrandName = TableName.brand.name;
-  final ImageHelper _imageHelper = ImageHelper();
+  final _imageHelper = ImageHelper();
   final _formKey = GlobalKey<FormState>();
   late HistoryNotifier _historyNotifier;
 
@@ -63,10 +63,15 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
     }
     final db = await SQLiteHelper.db;
     return db.query(TableName.anyFile.name,
-        where: "brandId = ?", whereArgs: [brand.id]).then((value) => value[0]);
+        where: "brandId = ?", whereArgs: [brand.id]).then((value) {
+      if (value.isEmpty) {
+        return null;
+      }
+      return value.first;
+    });
   }
 
-  Future<void> create() async {
+  Future<void> upsert() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
 
@@ -110,34 +115,41 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
               where: "id = ?", whereArgs: [imageBrand.id]);
         }
       }
-    }).then((_) => showDialog(
-        context: context,
-        useRootNavigator: false,
-        builder: (dialogContext) => Dialog(
-                child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 200),
-              child: SingleChildScrollView(
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Flex(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      direction: Axis.vertical,
-                      children: <Widget>[
-                        const Text("Thành công thêm Thương hiệu mới"),
-                        Text(jsonEncode(brand.toMap())),
-                        Wrap(
+    }).then((_) {
+      if (mounted) {
+        final message = widget.iniData != null
+            ? 'Thành công cập nhật thương hiệu'
+            : 'Thành công thêm thương hiệu mới';
+        return showDialog(
+            context: context,
+            useRootNavigator: false,
+            builder: (dialogContext) => Dialog(
+                    child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 200),
+                  child: SingleChildScrollView(
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Flex(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          direction: Axis.vertical,
                           children: <Widget>[
-                            TextButton(
-                                onPressed: (() {
-                                  Navigator.pop(dialogContext);
-                                }),
-                                child: const Text("Ok"))
+                            Text(message),
+                            Text(jsonEncode(brand.toMap())),
+                            Wrap(
+                              children: <Widget>[
+                                TextButton(
+                                    onPressed: (() {
+                                      Navigator.pop(dialogContext);
+                                    }),
+                                    child: const Text("Ok"))
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    )),
-              ),
-            ))));
+                        )),
+                  ),
+                )));
+      }
+    });
   }
 
   Future<void> delete() async {
@@ -152,7 +164,9 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
             table: tableBrandName,
             data: brand.id);
         _historyNotifier.add(history);
-        Navigator.pop(context);
+        if (mounted) {
+          Navigator.pop(context);
+        }
       });
     }
   }
@@ -329,7 +343,7 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
                         ),
                         const SizedBox(height: 30),
                         ElevatedButton(
-                            onPressed: create, child: const Text("Submit"))
+                            onPressed: upsert, child: const Text("Submit"))
                       ],
                     )),
               ),
