@@ -41,10 +41,10 @@ mixin FileHelper {
     Archive? decodeArchive;
     if (isZip) {
       final zipDecoder = ZipDecoder();
-      decodeArchive = zipDecoder.decodeBuffer(inputStream);
+      decodeArchive = zipDecoder.decodeStream(inputStream);
     } else if (isTar) {
       final tarDecoder = TarDecoder();
-      decodeArchive = tarDecoder.decodeBuffer(inputStream);
+      decodeArchive = tarDecoder.decodeStream(inputStream);
     }
     if (decodeArchive == null) return [];
     return decodeArchive.files.map((file) {

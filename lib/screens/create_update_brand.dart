@@ -179,8 +179,11 @@ class _CreateUpdateBrandState extends State<CreateUpdateBrand> {
   Future<void> pickImage() async {
     final file = await _imageHelper.pick(source: ImageSource.camera);
     if (file != null) {
-      final cropped =
-          await _imageHelper.crop(file, cropStyle: CropStyle.circle);
+      final cropped = await _imageHelper.crop(file, uiSettings: [
+        AndroidUiSettings(
+          cropStyle: CropStyle.circle,
+        )
+      ]);
       if (cropped != null) {
         setState(() {
           imagePath = cropped.path;

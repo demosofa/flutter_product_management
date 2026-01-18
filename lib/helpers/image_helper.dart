@@ -43,14 +43,6 @@ class ImageHelper with FileHelper {
     int? maxWidth,
     int? maxHeight,
     CropAspectRatio? aspectRatio,
-    List<CropAspectRatioPreset> aspectRatioPresets = const [
-      CropAspectRatioPreset.original,
-      CropAspectRatioPreset.square,
-      CropAspectRatioPreset.ratio3x2,
-      CropAspectRatioPreset.ratio4x3,
-      CropAspectRatioPreset.ratio16x9
-    ],
-    CropStyle cropStyle = CropStyle.rectangle,
     ImageCompressFormat compressFormat = ImageCompressFormat.jpg,
     int compressQuality = 90,
     List<PlatformUiSettings>? uiSettings,
@@ -60,8 +52,6 @@ class ImageHelper with FileHelper {
           maxHeight: maxHeight,
           maxWidth: maxWidth,
           aspectRatio: aspectRatio,
-          aspectRatioPresets: aspectRatioPresets,
-          cropStyle: cropStyle,
           compressFormat: compressFormat,
           compressQuality: compressQuality,
           uiSettings: uiSettings);

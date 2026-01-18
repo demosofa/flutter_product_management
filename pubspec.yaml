@@ -38,13 +38,13 @@ dependencies:
   mask_text_input_formatter: ^2.4.0
   sqflite: ^2.2.2
   path: ^1.8.2
-  intl: ^0.18.0
+  intl: ^0.20.2
   path_provider: ^2.0.12
   image_picker: ^1.0.4
-  image_cropper: ^5.0.0
-  permission_handler: ^11.0.1
+  image_cropper: ^11.0.0
+  permission_handler: ^12.0.1
   flutter_image_compress: ^2.0.2
-  archive: ^3.3.7
+  archive: ^4.0.7
   string_validator: ^1.0.0
   shared_preferences: ^2.2.2
 
@@ -57,7 +57,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
