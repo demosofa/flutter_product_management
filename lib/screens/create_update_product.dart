@@ -1,3 +1,5 @@
+// import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:product_manager/enums/history_type.dart';
@@ -54,7 +56,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     if (db.isOpen) {
       lstBrand = await db.query(TableName.brand.name);
     }
-    if (lstBrand.isEmpty && context.mounted) {
+    if (lstBrand.isEmpty && mounted && context.mounted) {
       await showDialog(
           barrierDismissible: false,
           context: context,
@@ -73,7 +75,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                         Navigator.of(context)
                             .pushNamed("/create_update_brand")
                             .then((value) {
-                          Navigator.pop(dialogContext);
+                          if (dialogContext.mounted) {
+                            Navigator.pop(dialogContext);
+                          }
                           setState(() {});
                         });
                       },
@@ -87,7 +91,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
   Future<List<Map<String, dynamic>>> fetchImages() async {
     List<Map<String, Object?>> lstImage = [];
     final db = await SQLiteHelper.db;
-    if (db.isOpen && product.id != null && context.mounted) {
+    if (db.isOpen && product.id != null) {
       lstImage = await db.query(TableName.anyFile.name,
           where: "productId = ?", whereArgs: [product.id]);
     }
@@ -96,17 +100,18 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
 
   Future<void> delete() async {
     final db = await SQLiteHelper.db;
-    if (db.isOpen && context.mounted) {
+    if (db.isOpen) {
       await db.transaction((txn) async {
         await txn
             .delete(tableProductName, where: "id = ?", whereArgs: [product.id]);
-      }).then((value) {
         final history = History(
             type: HistoryType.delete.name,
             table: tableProductName,
             data: product.id!);
         _historyNotifier.add(history);
-        Navigator.pop(context);
+        if (mounted && context.mounted) {
+          Navigator.pop(context);
+        }
       });
     }
   }
@@ -119,15 +124,16 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
     if (db.isOpen && context.mounted) {
       await db.transaction((txn) async {
         if (widget.iniData == null) {
-          await txn.insert(tableProductName, product.toMap()).then((_) {
-            final history = History(
-                type: HistoryType.insert.name,
-                table: tableProductName,
-                data: product.toMap());
-            _historyNotifier.add(history);
+          await txn.insert(tableProductName, product.toMap());
+          final history = History(
+              type: HistoryType.insert.name,
+              table: tableProductName,
+              data: product.toMap());
+          _historyNotifier.add(history);
+          if (mounted && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Sản phẩm đã được tạo")));
-          });
+          }
         } else {
           await txn.update(tableProductName, product.toMap(),
               where: 'id = ?', whereArgs: [product.id]);
@@ -176,7 +182,7 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                               Expanded(
                                 child: DropdownButtonFormField<String>(
                                     hint: const Text("Brand"),
-                                    value: dropdownBrand.isNotEmpty
+                                    initialValue: dropdownBrand.isNotEmpty
                                         ? dropdownBrand
                                         : snapshot.data!.first["id"].toString(),
                                     onChanged: (value) {
@@ -198,7 +204,9 @@ class _CreateUpdateProductState extends State<CreateUpdateProduct> {
                                                       "/create_update_brand",
                                                       arguments: brand)
                                                   .then((value) {
-                                                Navigator.pop(brandContext);
+                                                if (brandContext.mounted) {
+                                                  Navigator.pop(brandContext);
+                                                }
                                                 setState(() {});
                                               });
                                             },
