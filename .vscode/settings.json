@@ -1,5 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "dart.flutterSdkPath": "/home/trann/.puro/envs/stable/flutter",
-    "dart.sdkPath": "/home/trann/.puro/envs/stable/flutter/bin/cache/dart-sdk"
+    "dart.flutterSdkPath": "C:\\Users\\trann\\.puro\\envs\\stable\\flutter",
+    "dart.sdkPath": "C:\\Users\\trann\\.puro\\envs\\stable\\flutter\\bin\\cache\\dart-sdk"
 }
